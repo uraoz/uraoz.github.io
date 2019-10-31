@@ -38,10 +38,7 @@
 
         // Plane
 
-        plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
-        plane.position.y = - 200;
-        plane.rotation.x = - Math.PI / 2;
-        scene.add( plane );
+        
 
         renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
@@ -87,10 +84,9 @@
       function render() {
 
         var timer = Date.now() - start;
-
-        sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
         sphere.rotation.x = timer * 0.0003;
         sphere.rotation.z = timer * 0.0002;
+        sphere.rotation.x = timer * 0.0001;
 
         controls.update();
 
