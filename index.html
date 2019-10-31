@@ -53,7 +53,7 @@
 
         document.body.appendChild( effect.domElement );
 
-        controls = new TrackballControls( camera, effect.domElement );
+        //controls = new TrackballControls( camera, effect.domElement );
 
         //
 
@@ -88,7 +88,7 @@
         sphere.rotation.z = timer * 0.0002;
         sphere.rotation.x = timer * 0.0001;
 
-        controls.update();
+        //controls.update();
 
         effect.render( scene, camera );
 
