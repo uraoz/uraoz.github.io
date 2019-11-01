@@ -25,9 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.109.0/examples/js/effects/AsciiEffect.js"></script>
   
   <script>
-  var camera,mesh,helper, controls, scene, renderer, effect, sphere, container;
-  var ready = false;
-  var clock = new THREE.Clock();
+  var camera, controls, scene, renderer, effect, sphere;
 
   var start = Date.now();
   
@@ -46,47 +44,25 @@
     camera.position.z = 500;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xffffff );
-    scene.add( new THREE.PolarGridHelper( 30, 10 ) );
-    var ambient = new THREE.AmbientLight( 0x666666 );
-    scene.add( ambient );
+    
     
     var light = new THREE.PointLight( 0xffffff );
     light.position.set( 500, 500, 500 );
     scene.add( light );
 
-    var directionalLight = new THREE.DirectionalLight( 0x887766 );
-    directionalLight.position.set( - 1, 1, 1 ).normalize();
-    scene.add( directionalLight );
-
     sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
         scene.add( sphere );
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });renderer.setPixelRatio( window.devicePixelRatio );
+    renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
-    container.appendChild( renderer.domElement );
 
     effect = new THREE.AsciiEffect( renderer, ' 123456789', { invert: true } );
     effect.setSize( window.innerWidth, window.innerHeight );
     effect.domElement.style.color = 'white';
     effect.domElement.style.backgroundColor = 'black';
-
-    function onProgress( xhr ) {
-
-      if ( xhr.lengthComputable ) {
-
-        var percentComplete = xhr.loaded / xhr.total * 100;
-        console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
-
-      }
-
-    }
-
-
     document.body.appendChild( effect.domElement );
-
     controls = new THREE.TrackballControls( camera, effect.domElement );
-
+    
         //
 
     window.addEventListener( 'resize', onWindowResize, false );
