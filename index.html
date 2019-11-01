@@ -23,9 +23,9 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.109.0/examples/js/effects/AsciiEffect.js"></script>
   
   <script>
-
-    window.addEventListener('load', init);
-
+    init();
+    tick();
+    var start = Date.now();
     function init() {
 
       // size
@@ -82,8 +82,6 @@
         controls.update();
         effect.render( scene, camera );
       }
-
-      tick();
 
       function tick() {
         requestAnimationFrame(tick);
