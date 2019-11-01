@@ -30,14 +30,11 @@
   var clock = new THREE.Clock();
 
   var start = Date.now();
-  Ammo().then( function ( AmmoLib ) {
+  
+  init();
+  animate();
 
-    Ammo = AmmoLib;
-
-    init();
-    animate();
-
-  } );
+  
 
   function init() {
 
