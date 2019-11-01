@@ -33,17 +33,17 @@
       const height = 540;
 
       // make renderer
-      const renderer = new THREE.WebGLRenderer({
+      var renderer = new THREE.WebGLRenderer({
         canvas: document.querySelector('#myCanvas')
       });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(width, height);
 
       // make scene
-      const scene = new THREE.Scene();
+      var scene = new THREE.Scene();
 
       // camera position
-      const camera = new THREE.PerspectiveCamera(45, width / height);
+      var camera = new THREE.PerspectiveCamera(45, width / height);
       camera.position.set(0, 0, +1000);
 
 
@@ -61,7 +61,22 @@
       effect.domElement.style.backgroundColor = 'black';
       document.body.appendChild( effect.domElement );
       var controls = new THREE.TrackballControls( camera, effect.domElement );
+
+      function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        effect.setSize( window.innerWidth, window.innerHeight );
+
+      }
       
+      function render(){
+        box.rotation.y += 0.01;
+        controls.update();
+        effect.render( scene, camera );
+      }
 
       tick();
 
@@ -70,11 +85,7 @@
         render();
       }
 
-      function render(){
-        box.rotation.y += 0.01;
-        controls.update();
-        effect.render( scene, camera );
-      }
+      
     }
   </script>
 </head>
