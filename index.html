@@ -46,19 +46,35 @@
       const camera = new THREE.PerspectiveCamera(45, width / height);
       camera.position.set(0, 0, +1000);
 
+
+
       // object make
       const geometry = new THREE.BoxGeometry(400, 400, 400);
       const material = new THREE.MeshNormalMaterial();
       const box = new THREE.Mesh(geometry, material);
       scene.add(box);
 
+
+      effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+      effect.setSize( window.innerWidth, window.innerHeight );
+      effect.domElement.style.color = 'white';
+      effect.domElement.style.backgroundColor = 'black';
+      document.body.appendChild( effect.domElement );
+      controls = new TrackballControls( camera, effect.domElement );
+      
+
       tick();
 
       function tick() {
         box.rotation.y += 0.01;
         renderer.render(scene, camera);
-
+        render();
         requestAnimationFrame(tick);
+      }
+
+      function render(){
+        controls.update();
+        effect.render( scene, camera );
       }
     }
   </script>
