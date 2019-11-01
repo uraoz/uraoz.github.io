@@ -55,7 +55,7 @@
       scene.add(box);
 
 
-      effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+      const effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
       effect.setSize( window.innerWidth, window.innerHeight );
       effect.domElement.style.color = 'white';
       effect.domElement.style.backgroundColor = 'black';
