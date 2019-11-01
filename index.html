@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.109.0/examples/js/effects/AsciiEffect.js"></script>
   
   <script>
-  var camera, controls, scene, renderer, effect;
+  var camera, controls, scene, renderer, effect,sphere;
 
   var start = Date.now();
 
@@ -48,7 +48,7 @@
     light.position.set( - 500, - 500, - 500 );
     scene.add( light );
 
-    var sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
+    sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
         scene.add( sphere );
 
     renderer = new THREE.WebGLRenderer();
