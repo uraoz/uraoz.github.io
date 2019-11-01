@@ -55,24 +55,24 @@
       scene.add(box);
 
 
-      const effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
-      effect.setSize( window.innerWidth, window.innerHeight );
+      var effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+      effect.setSize( width, height );
       effect.domElement.style.color = 'white';
       effect.domElement.style.backgroundColor = 'black';
       document.body.appendChild( effect.domElement );
-      const controls = new THREE.TrackballControls( camera, effect.domElement );
+      var controls = new THREE.TrackballControls( camera, effect.domElement );
       
 
       tick();
 
       function tick() {
-        box.rotation.y += 0.01;
-        renderer.render(scene, camera);
-        render();
         requestAnimationFrame(tick);
+        render();
       }
 
       function render(){
+        box.rotation.y += 0.01;
+        renderer.render(scene, camera);
         controls.update();
         effect.render( scene, camera );
       }
