@@ -16,31 +16,14 @@ analyser.fftSize = 512;
 microphone.connect(analyser);
 analyser.connect(javascriptNode);
 javascriptNode.connect(audioContext.destination);
-
 canvas = document.getElementById("renderer");
-
-javascriptNode.onaudioprocess = function() {
-frequency_array = new Uint8Array(analyser.frequencyBinCount);
-
-}
-
-}, function(e){ console.log(e); }
-                        );
-animationLooper();
-function animationLooper(){
-    
-    // set to the size of device
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx = canvas.getContext("2d");
-    
-    // find the center of the window
-    center_x = canvas.width / 2;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx = canvas.getContext("2d");
+center_x = canvas.width / 2;
     center_y = canvas.height / 2;
     radius = 150;
-    
-    // style the background
-    var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"rgba(35, 7, 77, 1)");
     gradient.addColorStop(1,"rgba(204, 83, 51, 1)");
     ctx.fillStyle = gradient;
@@ -69,9 +52,14 @@ function animationLooper(){
         drawBar(x, y, x_end, y_end, bar_width,frequency_array[i]);
     
     }
-    window.requestAnimationFrame(animationLooper);
+javascriptNode.onaudioprocess = function() {
+frequency_array = new Uint8Array(analyser.frequencyBinCount);
+
 }
- 
+
+}, function(e){ console.log(e); }
+                        );
+
 // for drawing a bar
 function drawBar(x1, y1, x2, y2, width,frequency){
     
