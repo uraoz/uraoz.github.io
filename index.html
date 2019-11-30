@@ -22,8 +22,7 @@ canvasContext = document.getElementById("test");
 canvasContext= canvasContext.getContext("2d");
 
 javascriptNode.onaudioprocess = function() {
-var array =  new Uint8Array(analyser.frequencyBinCount);
-analyser.getByteFrequencyData(array);
+frequency_array = new Uint8Array(analyser.frequencyBinCount);
 animationLooper();
 }
 
