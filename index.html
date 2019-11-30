@@ -5,7 +5,7 @@ var canvas, ctx, center_x, center_y, radius, bars,
 x_end, y_end, bar_height, bar_width,
 frequency_array;
 bars = 200;
-bar_width = 2;
+bar_width = 4;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
   analyser = audioContext.createAnalyser();
@@ -58,7 +58,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       y = center_y + Math.sin(rads * i) * (radius);
       x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
       y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
-      var lineColor = "rgb(" + frequency_array[i]*2 + ", " + frequency_array[i]*2 + ", " + 205 + ")";
+      var lineColor = "rgb(" + frequency_array[i]*0.4 + ", " + frequency_array[i]*2.0 + ", " + 205 + ")";
     
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = bar_width;
