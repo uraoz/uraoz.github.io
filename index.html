@@ -58,7 +58,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       y = center_y + Math.sin(rads * i) * (radius);
       x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
       y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
-      var lineColor = "rgb(" + frequency_array[i]*0.01*i + ", " + frequency_array[i]*2.0 + ", " + 205 + ")";
+      var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 2.05*i + ")";
     
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = bar_width;
