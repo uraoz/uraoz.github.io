@@ -17,9 +17,7 @@ microphone.connect(analyser);
 analyser.connect(javascriptNode);
 javascriptNode.connect(audioContext.destination);
 
-//canvasContext = $("#canvas")[0].getContext("2d");
-canvasContext = document.getElementById("test");
-canvasContext= canvasContext.getContext("2d");
+canvas = document.getElementById("renderer");
 
 javascriptNode.onaudioprocess = function() {
 frequency_array = new Uint8Array(analyser.frequencyBinCount);
@@ -32,7 +30,6 @@ animationLooper();
 function animationLooper(){
     
     // set to the size of device
-    canvas = document.getElementById("renderer");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     ctx = canvas.getContext("2d");
