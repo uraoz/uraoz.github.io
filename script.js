@@ -10,19 +10,17 @@ function initPage(){
     if (!navigator.mediaDevices) {
         alert("設定変えてクレメンス...");
     }
-    audio = new Audio();
+    audio = new AudioContext();
+    analyser = audio.createAnalyser();
+    microphone = audio.createMediaStreamSource(stream);
+    javascriptNode = audio.createScriptProcessor(1024, 1, 1);
     context = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = context.createAnalyser();
-    
-    audio.src = "resource/Big Blast Sonic.mp3"; // the source path
     source = context.createMediaElementSource(audio);
     source.connect(analyser);
     analyser.connect(context.destination);
- 
-    
+    javascriptNode.connect(audioContext.destination);
     frequency_array = new Uint8Array(analyser.frequencyBinCount);
-    
-    audio.play();
+
     animationLooper();
 }
  
