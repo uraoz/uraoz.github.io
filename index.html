@@ -7,26 +7,34 @@ frequency_array;
 bars = 200;
 bar_width = 2;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
-audioContext = new AudioContext();
-analyser = audioContext.createAnalyser();
-microphone = audioContext.createMediaStreamSource(stream);
-javascriptNode = audioContext.createScriptProcessor(1024, 1, 1);
+  audioContext = new AudioContext();
+  analyser = audioContext.createAnalyser();
+  microphone = audioContext.createMediaStreamSource(stream);
+  javascriptNode = audioContext.createScriptProcessor(1024, 1, 1);
 
-analyser.smoothingTimeConstant = 0.0;
-analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = 0.0;
+  analyser.fftSize = 512;
 
-microphone.connect(analyser);
-analyser.connect(javascriptNode);
-javascriptNode.connect(audioContext.destination);
-canvas = document.getElementById("renderer");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-ctx = canvas.getContext("2d");
-center_x = canvas.width / 2;
-    center_y = canvas.height / 2;
-    radius = 150;
-    frequency_array = new Uint8Array(analyser.frequencyBinCount);
-var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+  microphone.connect(analyser);
+  analyser.connect(javascriptNode);
+  javascriptNode.connect(audioContext.destination);
+  canvas = document.getElementById("renderer");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx = canvas.getContext("2d");
+  center_x = canvas.width / 2;
+  center_y = canvas.height / 2;
+  radius = 150;
+  javascriptNode.onaudioprocess = function() {
+    var frequency_array =  new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(frequency_array);
+    var values = 0;
+
+    var length = frequency_array.length;
+    for (var i = 0; i < length; i++) {
+      values += array[i];
+    }
+    var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"rgba(35, 7, 77, 1)");
     gradient.addColorStop(1,"rgba(204, 83, 51, 1)");
     ctx.fillStyle = gradient;
@@ -41,29 +49,26 @@ var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     for(var i = 0; i < bars; i++){
         
         //divide a circle into equal parts
-        rads = Math.PI * 2 / bars;
-        
-        bar_height = frequency_array[i]*0.7;
+      rads = Math.PI * 2 / bars;
+      
+      bar_height = frequency_array[i]*0.7;
         
         // set coordinates
-        x = center_x + Math.cos(rads * i) * (radius);
-        y = center_y + Math.sin(rads * i) * (radius);
-        x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
-        y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
-        var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 205 + ")";
+      x = center_x + Math.cos(rads * i) * (radius);
+      y = center_y + Math.sin(rads * i) * (radius);
+      x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
+      y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
+      var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 205 + ")";
     
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = bar_width;
-    ctx.beginPath();
-    ctx.moveTo(x,y);
-    ctx.lineTo(x_end,y_end);
-    ctx.stroke();
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = bar_width;
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.lineTo(x_end,y_end);
+      ctx.stroke();
     
     }
-
-
-}, function(e){ console.log(e); }
-                        );
+  }, function(e){ console.log(e); });
 </script>
   <canvas id="renderer"></canvas>
 </body>
