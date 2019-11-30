@@ -1,4 +1,4 @@
-<body>
+<head>
 <canvas id="test"></canvas>
 <script type="text/javascript">
 var canvas, ctx, center_x, center_y, radius, bars, 
@@ -35,8 +35,8 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       values += frequency_array[i];
     }
     var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
-    gradient.addColorStop(0,"rgba(35, 7, 77, 1)");
-    gradient.addColorStop(1,"rgba(204, 83, 51, 1)");
+    gradient.addColorStop(0,"rgba(235, 7, 77, 1)");
+    gradient.addColorStop(1,"rgba(20, 183, 251, 1)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0,0,canvas.width,canvas.height);
     
@@ -58,7 +58,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       y = center_y + Math.sin(rads * i) * (radius);
       x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
       y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
-      var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 205 + ")";
+      var lineColor = "rgb(" + frequency_array[i]*2 + ", " + frequency_array[i]*2 + ", " + 205 + ")";
     
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = bar_width;
@@ -72,4 +72,4 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
   }, function(e){ console.log(e); });
 </script>
   <canvas id="renderer"></canvas>
-</body>
+</head>
