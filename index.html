@@ -23,11 +23,12 @@ canvasContext= canvasContext.getContext("2d");
 
 javascriptNode.onaudioprocess = function() {
 frequency_array = new Uint8Array(analyser.frequencyBinCount);
-animationLooper();
+
 }
 
 }, function(e){ console.log(e); }
                         );
+animationLooper();
 function animationLooper(){
     
     // set to the size of device
