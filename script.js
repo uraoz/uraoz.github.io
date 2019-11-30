@@ -7,6 +7,9 @@ bar_width = 2;
  
 function initPage(){
     
+    if (!navigator.mediaDevices) {
+        alert("設定変えてクレメンス...");
+    }
     audio = new Audio();
     context = new (window.AudioContext || window.webkitAudioContext)();
     analyser = context.createAnalyser();
