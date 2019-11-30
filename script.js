@@ -6,10 +6,14 @@ bars = 200;
 bar_width = 2;
  
 function initPage(){
-    
-    if (!navigator.mediaDevices) {
-        alert("設定変えてクレメンス...");
+    var player = document.getElementById('player');
+    var handleSuccess = function(stream) {
+    if (window.URL) {
+      player.src = window.URL.createObjectURL(stream);
+    } else {
+      player.src = stream;
     }
+    };
     audio = new AudioContext();
     analyser = audio.createAnalyser();
     microphone = audio.createMediaStreamSource(stream);
