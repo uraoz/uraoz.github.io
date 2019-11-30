@@ -24,7 +24,7 @@ canvasContext= canvasContext.getContext("2d");
 javascriptNode.onaudioprocess = function() {
 var array =  new Uint8Array(analyser.frequencyBinCount);
 analyser.getByteFrequencyData(array);
-function animationLooper();
+animationLooper();
 }
 
 }, function(e){ console.log(e); }
