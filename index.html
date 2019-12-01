@@ -37,7 +37,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
     }
     var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"hsl(" + backcolor + ", 100%, 50%)");
-    gradient.addColorStop(1,"hsl(" + backcolor-120 + ", 100%, 50%)");
+    gradient.addColorStop(1,"hsl(" + (backcolor-120) + ", 100%, 50%)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0,0,canvas.width,canvas.height);
     
