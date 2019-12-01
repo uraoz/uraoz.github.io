@@ -6,7 +6,7 @@ backcolor = 360 * Math.random();
 rotetion = 0;
 barwidth = 2;
 radius = 250-Math.random()*50;
-navigator.webkitGetUserMedia({audio:true}, function(stream){
+navigator.mediaDevices.getUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
   analyser = audioContext.createAnalyser();
   microphone = audioContext.createMediaStreamSource(stream);
