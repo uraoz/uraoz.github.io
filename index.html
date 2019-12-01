@@ -1,11 +1,8 @@
 <head>
+  <title>Sound Visualizer</title>
 <script type="text/javascript">
-var canvas, ctx, centerx, centery, radius, bars, xend, yend, barheight, barwidth, rotetion, backcolor, array;
-bars = 100;
-backcolor = 360 * Math.random();
-rotetion = 0;
-barwidth = 2;
-radius = 250-Math.random()*50;
+var canvas, ctx, centerx, centery, xend, yend, barheight, array;
+var bars = 100,backcolor = 360 * Math.random(),rotetion = 0,barwidth = 2,radius = 250-Math.random()*50;
 
 navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia);
 navigator.getUserMedia({audio:true}, function(stream){
@@ -68,7 +65,7 @@ navigator.getUserMedia({audio:true}, function(stream){
     }
     rotetion+=0.02;
   }
-  }, function(e){ console.log(e); });
+}, function(e){ console.log(e); });
 </script>
   <canvas id="renderer"></canvas>
 </head>
