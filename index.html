@@ -8,7 +8,7 @@ barwidth = 2;
 radius = 250-Math.random()*50;
 
 navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-navigator.webkitGetUserMedia({audio:true}, function(stream){
+navigator.getUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
   analyser = audioContext.createAnalyser();
   microphone = audioContext.createMediaStreamSource(stream);
