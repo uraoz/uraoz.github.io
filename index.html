@@ -1,9 +1,10 @@
 <head>
 <script type="text/javascript">
 var canvas, ctx, center_x, center_y, radius, bars, 
-x_end, y_end, bar_height, bar_width,rotetion,
+x_end, y_end, bar_height, bar_width,rotetion,backcolor,
 frequency_array;
 bars = 100;
+backcolor = 360 * Math.random();
 rotetion = 0;
 bar_width = 4;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
@@ -35,8 +36,8 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       values += frequency_array[i];
     }
     var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
-    gradient.addColorStop(0,"hsl(" + 360 * Math.random() + ", 100%, 50%)");
-    gradient.addColorStop(1,"hsl(" + 360 * Math.random() + ", 100%, 50%)");
+    gradient.addColorStop(0,"hsl(" + backcolor + ", 100%, 50%)");
+    gradient.addColorStop(1,"hsl(" + backcolor-120 + ", 100%, 50%)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0,0,canvas.width,canvas.height);
     
