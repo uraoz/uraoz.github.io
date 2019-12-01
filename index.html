@@ -5,6 +5,7 @@ bars = 100;
 backcolor = 360 * Math.random();
 rotetion = 0;
 barwidth = 2;
+radius = 300-Math.random()*50;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
   analyser = audioContext.createAnalyser();
@@ -23,7 +24,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
   ctx = canvas.getContext("2d");
   centerx = canvas.width / 2;
   centery = canvas.height / 2;
-  radius = 300;
+  
   javascriptNode.onaudioprocess = function() {
     array =  new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(array);
