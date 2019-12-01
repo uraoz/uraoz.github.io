@@ -56,7 +56,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       y = centery + Math.sin(rads * (i + rotetion)) * (radius);
       xend = centerx + Math.cos(rads * (i + rotetion))*(radius + barheight);
       yend = centery + Math.sin(rads * (i + rotetion))*(radius + barheight);
-      var lineColor = "hsl(" + (backcolor+120+rotetion) + ", +100%, "+(50+array[i]*0.4)+"%)";
+      var lineColor = "hsl(" + (backcolor+120+rotetion) + ", +100%, "+(50+array[i]*0.1)+"%)";
       ctx.strokeStyle = lineColor;
       ctx.lineWidth = barwidth;
       ctx.beginPath();
