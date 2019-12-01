@@ -41,8 +41,6 @@ navigator.getUserMedia({audio:true}, function(stream){
     gradient.addColorStop(1,"hsl(" + (backcolor-120+rotetion) + ", 100%, 50%)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.font = "100px serif";
-    ctx.fillText("🤔", centerx, centery);
     
     ctx.beginPath();
     ctx.arc(centerx,centery,radius,0,2*Math.PI);
