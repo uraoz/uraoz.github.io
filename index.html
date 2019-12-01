@@ -1,10 +1,10 @@
 <head>
-<canvas id="test"></canvas>
 <script type="text/javascript">
 var canvas, ctx, center_x, center_y, radius, bars, 
-x_end, y_end, bar_height, bar_width,
+x_end, y_end, bar_height, bar_width,rotetion,
 frequency_array;
 bars = 100;
+rotetion = 0;
 bar_width = 4;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
@@ -54,10 +54,10 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       bar_height = frequency_array[i]*0.7;
         
         // set coordinates
-      x = center_x + Math.cos(rads * i) * (radius);
-      y = center_y + Math.sin(rads * i) * (radius);
-      x_end = center_x + Math.cos(rads * i)*(radius + bar_height);
-      y_end = center_y + Math.sin(rads * i)*(radius + bar_height);
+      x = center_x + Math.cos(rads * (i + rotetion) * (radius);
+      y = center_y + Math.sin(rads * (i + rotetion) * (radius);
+      x_end = center_x + Math.cos(rads * (i + rotetion)*(radius + bar_height);
+      y_end = center_y + Math.sin(rads * (i + rotetion)*(radius + bar_height);
       var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 100+i + ")";
     
       ctx.strokeStyle = lineColor;
@@ -66,7 +66,7 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       ctx.moveTo(x,y);
       ctx.lineTo(x_end,y_end);
       ctx.stroke();
-    
+      rotetion+=0.2;
     }
   }
   }, function(e){ console.log(e); });
