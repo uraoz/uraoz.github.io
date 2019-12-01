@@ -1,12 +1,10 @@
 <head>
 <script type="text/javascript">
-var canvas, ctx, center_x, center_y, radius, bars, 
-x_end, y_end, bar_height, bar_width,rotetion,backcolor,
-frequency_array;
+var canvas, ctx, centerx, centery, radius, bars, xend, yend, barheight, barwidth, rotetion, backcolor, array;
 bars = 100;
 backcolor = 360 * Math.random();
 rotetion = 0;
-bar_width = 4;
+barwidth = 2;
 navigator.webkitGetUserMedia({audio:true}, function(stream){
   audioContext = new AudioContext();
   analyser = audioContext.createAnalyser();
@@ -23,17 +21,17 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   ctx = canvas.getContext("2d");
-  center_x = canvas.width / 2;
-  center_y = canvas.height / 2;
+  centerx = canvas.width / 2;
+  centery = canvas.height / 2;
   radius = 300;
   javascriptNode.onaudioprocess = function() {
-    var frequency_array =  new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(frequency_array);
+    array =  new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(array);
     var values = 0;
 
-    var length = frequency_array.length;
+    var length = array.length;
     for (var i = 0; i < length; i++) {
-      values += frequency_array[i];
+      values += array[i];
     }
     var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"hsl(" + backcolor + ", 100%, 50%)");
@@ -41,30 +39,28 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
     ctx.fillStyle = gradient;
     ctx.fillRect(0,0,canvas.width,canvas.height);
     
-    //draw a circle
+    
     ctx.beginPath();
-    ctx.arc(center_x,center_y,radius,0,2*Math.PI);
+    ctx.arc(centerx,centery,radius,0,2*Math.PI);
     ctx.stroke();
     
-    analyser.getByteFrequencyData(frequency_array);
+    analyser.getByteFrequencyData(array);
     for(var i = 0; i < bars; i++){
         
-        //divide a circle into equal parts
       rads = Math.PI * 2 / bars;
       
-      bar_height = frequency_array[i]*0.7;
+      barheight = array[i]*0.7;
         
-        // set coordinates
-      x = center_x + Math.cos(rads * (i + rotetion)) * (radius);
-      y = center_y + Math.sin(rads * (i + rotetion)) * (radius);
-      x_end = center_x + Math.cos(rads * (i + rotetion))*(radius + bar_height);
-      y_end = center_y + Math.sin(rads * (i + rotetion))*(radius + bar_height);
-      var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 100+i + ")";
+      x = centerx + Math.cos(rads * (i + rotetion)) * (radius);
+      y = centery + Math.sin(rads * (i + rotetion)) * (radius);
+      xend = centerx + Math.cos(rads * (i + rotetion))*(radius + barheight);
+      yend = centery + Math.sin(rads * (i + rotetion))*(radius + barheight);
+      var lineColor = "rgb(" + array[i] + ", " + array[i] + ", " + 100+i + ")";
       ctx.strokeStyle = lineColor;
-      ctx.lineWidth = bar_width;
+      ctx.lineWidth = barwidth;
       ctx.beginPath();
       ctx.moveTo(x,y);
-      ctx.lineTo(x_end,y_end);
+      ctx.lineTo(xend,yend);
       ctx.stroke();
       
     }
