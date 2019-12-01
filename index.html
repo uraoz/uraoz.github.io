@@ -54,10 +54,10 @@ navigator.webkitGetUserMedia({audio:true}, function(stream){
       bar_height = frequency_array[i]*0.7;
         
         // set coordinates
-      x = center_x + Math.cos(rads * (i + rotetion) * (radius);
-      y = center_y + Math.sin(rads * (i + rotetion) * (radius);
-      x_end = center_x + Math.cos(rads * (i + rotetion)*(radius + bar_height);
-      y_end = center_y + Math.sin(rads * (i + rotetion)*(radius + bar_height);
+      x = center_x + Math.cos(rads * (i + rotetion)) * (radius);
+      y = center_y + Math.sin(rads * (i + rotetion)) * (radius);
+      x_end = center_x + Math.cos(rads * (i + rotetion))*(radius + bar_height);
+      y_end = center_y + Math.sin(rads * (i + rotetion))*(radius + bar_height);
       var lineColor = "rgb(" + frequency_array[i] + ", " + frequency_array[i] + ", " + 100+i + ")";
     
       ctx.strokeStyle = lineColor;
