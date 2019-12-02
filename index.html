@@ -64,6 +64,20 @@ navigator.getUserMedia({audio:true}, function(stream){
     rotetion+=0.02;
   }
 }, function(e){ console.log(e); });
+
+window.onload = function(){
+    var stage = new createjs.Stage("renderer");
+
+    var id;
+    $(window).on('resize', function(e){
+        clearTimeout(id);
+        id = setTimeout(function(){
+            stage.canvas.width = $(e.target).width();
+            stage.canvas.height = $(e.target).height();
+        }, 100);
+    });
+    $(window).trigger('resize');
+}
 </script>
   <canvas id="renderer"></canvas>
 </head>
