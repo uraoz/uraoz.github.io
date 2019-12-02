@@ -1,6 +1,5 @@
 <head>
   <title>Sound Visualizer</title>
-<script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
 <script type="text/javascript">
 var canvas, ctx, centerx, centery, xend, yend, barheight, array;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
@@ -66,19 +65,7 @@ navigator.getUserMedia({audio:true}, function(stream){
   }
 }, function(e){ console.log(e); });
 
-window.onload = function(){
-    var stage = new createjs.Stage("renderer");
 
-    var id;
-    $(window).on('resize', function(e){
-        clearTimeout(id);
-        id = setTimeout(function(){
-            stage.canvas.width = $(e.target).width();
-            stage.canvas.height = $(e.target).height();
-        }, 100);
-    });
-    $(window).trigger('resize');
-}
 </script>
   <canvas id="renderer"></canvas>
 </head>
