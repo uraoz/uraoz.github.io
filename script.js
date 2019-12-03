@@ -1,13 +1,11 @@
 var xend, yend, barheight, array,context, canvas, ctx, centerx ,centery;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
-
-function initPage(){
-if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
+function Phone(){
   audio = new Audio();
   context = new (window.AudioContext || window.webkitAudioContext)();
   analyser = context.createAnalyser();
   //audio.src = "http://stream.gensokyoradio.net:8000/stream/1/";
-  
+
   audio.src = "Give me a break.mp3";
   source = context.createMediaElementSource(audio);
   source.connect(analyser);
@@ -15,6 +13,10 @@ if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('i
   array = new Uint8Array(analyser.frequencyBinCount);
   audio.play();
   animationLooper();
+}
+function initPage(){
+if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
+  Phone();
 }else{
 navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia);
 navigator.getUserMedia({audio:true}, function(stream){
