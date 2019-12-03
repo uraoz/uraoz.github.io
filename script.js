@@ -1,12 +1,7 @@
 
-var xend, yend, barheight, array,context;
+var xend, yend, barheight, array,context, canvas, ctx, centerx ,centery;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
-var canvas = document.getElementById("renderer");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-var ctx = canvas.getContext("2d");
-var centerx = canvas.width / 2;
-var centery = canvas.height / 2;
+
 function initPage(){
 if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
   audio = new Audio();
@@ -33,6 +28,13 @@ navigator.getUserMedia({audio:true}, function(stream){
   javascriptNode.connect(audioContext.destination);
   
   javascriptNode.onaudioprocess = function() {
+    canvas = document.getElementById("renderer");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    ctx = canvas.getContext("2d");
+    centerx = canvas.width / 2;
+    centery = canvas.height / 2;
     array =  new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(array);
     var values = 0;
@@ -77,7 +79,13 @@ navigator.getUserMedia({audio:true}, function(stream){
 }
 
 function animationLooper(){
-  
+  canvas = document.getElementById("renderer");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  ctx = canvas.getContext("2d");
+  centerx = canvas.width / 2;
+  centery = canvas.height / 2;
   var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"hsl(" + (backcolor+rotetion) + ", 100%, 50%)");
     gradient.addColorStop(1,"hsl(" + (backcolor-120+rotetion) + ", 100%, 50%)");
