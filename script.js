@@ -11,9 +11,7 @@ function Phone(){
   source.connect(analyser);
   analyser.connect(context.destination);
   array = new Uint8Array(analyser.frequencyBinCount);
-  audio.muted = true;
   audio.play();
-  audio.muted = false;
   animationLooper();
 }
 function initPage(){
