@@ -1,4 +1,3 @@
-
 var xend, yend, barheight, array,context, canvas, ctx, centerx ,centery;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
 
