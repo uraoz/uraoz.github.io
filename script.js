@@ -16,8 +16,11 @@ function Phone(){
   animationLooper();
 }
 function initPage(){
-if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
-  Phone();
+if ((navigator.userAgent.indexOf("iPhone") > 0 && navigator.userAgent.indexOf("iPad") == -1) || navigator.userAgent.indexOf("iPod") > 0 || navigator.userAgent.indexOf("Android") > 0){
+  var value = document.getElementById("renderer").innerHTML;
+  if(value > 200){
+    Phone();
+  }
 }else{
 navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia);
 navigator.getUserMedia({audio:true}, function(stream){
