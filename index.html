@@ -1,15 +1,16 @@
 <head>
   <title>Sound Visualizer</title>
+  <canvas id="renderer"></canvas>
 <script type="text/javascript">
-var canvas, ctx, centerx, centery, xend, yend, barheight, array;
+var xend, yend, barheight, array;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
 ctx = new (window.AudioContext || window.webkitAudioContext)();
-canvas = document.getElementById("renderer");
+var canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-ctx = canvas.getContext("2d");
-centerx = canvas.width / 2;
-centery = canvas.height / 2;
+var ctx = canvas.getContext("2d");
+var centerx = canvas.width / 2;
+var centery = canvas.height / 2;
 
 if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
   audio = new Audio();
@@ -106,5 +107,4 @@ function animationLooper(){
   window.requestAnimationFrame(animationLooper);
 }
 </script>
-  <canvas id="renderer"></canvas>
 </head>
