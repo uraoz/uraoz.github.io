@@ -1,4 +1,4 @@
-<head>
+<head onload="initPage()">
   <title>Sound Visualizer</title>
   <canvas id="renderer"></canvas>
 <script type="text/javascript">
@@ -10,12 +10,12 @@ canvas.height = window.innerHeight;
 var ctx = canvas.getContext("2d");
 var centerx = canvas.width / 2;
 var centery = canvas.height / 2;
-
+function initPage(){
 if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
   audio = new Audio();
   context = new (window.AudioContext || window.webkitAudioContext)();
   analyser = context.createAnalyser();
-  audio.src = "stream.gensokyoradio.net:8000/stream/1/";
+  audio.src = "http://stream.gensokyoradio.net:8000/stream/1/";
   source = context.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(context.destination);
@@ -77,6 +77,7 @@ navigator.getUserMedia({audio:true}, function(stream){
     rotetion+=0.02;
   }
 }, function(e){ console.log(e); });}
+}
 
 function animationLooper(){
   
