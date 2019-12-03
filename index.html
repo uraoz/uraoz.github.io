@@ -3,7 +3,7 @@
 <script type="text/javascript">
 var canvas, ctx, centerx, centery, xend, yend, barheight, array;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
-function initPage(){
+
 if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
   audio = new Audio();
   ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -79,7 +79,7 @@ navigator.getUserMedia({audio:true}, function(stream){
     rotetion+=0.02;
   }
 }, function(e){ console.log(e); });}
-}
+
 function animationLooper(){
   canvas = document.getElementById("renderer");
   canvas.width = window.innerWidth;
