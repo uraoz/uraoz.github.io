@@ -9,7 +9,7 @@ if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('i
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = ctx.createAnalyser();
     
-  audio.src = "http://stream.gensokyoradio.net:8000/stream/1/";
+  audio.src = "stream.gensokyoradio.net:8000/stream/1/";
   source = ctx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(ctx.destination);
