@@ -14,7 +14,6 @@ var centery = canvas.height / 2;
 
 if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0){
   audio = new Audio();
-  ctx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = ctx.createAnalyser();
   audio.src = "stream.gensokyoradio.net:8000/stream/1/";
   source = ctx.createMediaElementSource(audio);
