@@ -8,15 +8,18 @@ if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('i
   audio = new Audio();
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = ctx.createAnalyser();
-    
   audio.src = "stream.gensokyoradio.net:8000/stream/1/";
   source = ctx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(ctx.destination);
-    
   array = new Uint8Array(analyser.frequencyBinCount);
-    
   audio.play();
+  canvas = document.getElementById("renderer");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx = canvas.getContext("2d");
+  centerx = canvas.width / 2;
+  centery = canvas.height / 2;
   animationLooper();
 }else{
 navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia);
@@ -81,12 +84,7 @@ navigator.getUserMedia({audio:true}, function(stream){
 }, function(e){ console.log(e); });}
 
 function animationLooper(){
-  canvas = document.getElementById("renderer");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  ctx = canvas.getContext("2d");
-  centerx = canvas.width / 2;
-  centery = canvas.height / 2;
+  
   var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"hsl(" + (backcolor+rotetion) + ", 100%, 50%)");
     gradient.addColorStop(1,"hsl(" + (backcolor-120+rotetion) + ", 100%, 50%)");
