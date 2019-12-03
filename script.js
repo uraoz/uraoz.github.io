@@ -1,16 +1,17 @@
 var xend, yend, barheight, array,context, canvas, ctx, centerx ,centery;
 var bars = 100, backcolor = 360 * Math.random(), rotetion = 0, barwidth = 2, radius = 250-Math.random()*50;
 function Phone(){
-  audio = document.getElementById("music");
+  audio = new Audio();
   context = new (window.AudioContext || window.webkitAudioContext)();
   analyser = context.createAnalyser();
   //audio.src = "http://stream.gensokyoradio.net:8000/stream/1/";
 
-  //audio.src = "Give me a break.mp3";
+  audio.src = "Give me a break.mp3";
   source = context.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(context.destination);
   array = new Uint8Array(analyser.frequencyBinCount);
+  audio.muted = true;
   audio.play();
   audio.muted = false;
   animationLooper();
