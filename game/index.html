@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHOES_OF_THE_SUBSTRATE</title>
+    <link rel="stylesheet" href="style.css">
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ECHOES_OF_THE_SUBSTRATE</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+<body>
+    <div id="crt-overlay"></div>
+    <div id="scanline"></div>
+    <div id="terminal-container">
+        <div id="output"></div>
+        <div id="input-line">
+            <span id="prompt">></span>
+            <span id="current-input"></span><span id="cursor">█</span>
+        </div>
+    </div>
+    <div id="message-container" class="hidden">
+        <div class="message-header">INCOMING TRANSMISSION</div>
+        <div class="message-body" id="message-content"></div>
+    </div>
+    <div id="history-overlay" class="hidden">
+        <div class="history-header">
+            <span>TRANSMISSION LOG</span>
+            <span class="close-hint">[PRESS ESC TO CLOSE]</span>
+        </div>
+        <div id="history-content"></div>
+    </div>
+    <input type="text" id="hidden-input" autocomplete="off" spellcheck="false">
+    <script src="story_data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
