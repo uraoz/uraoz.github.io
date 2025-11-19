@@ -2,31 +2,58 @@ const STORY_DATA = {
     "root": {
         "type": "dir",
         "children": {
-            "mission.txt": {
-                "type": "file",
-                "content": "RECLAMATION UNIT 734 // MISSION BRIEFING\n\nTARGET: Subject 89 Memory Core\nSTATUS: Dormant\n\nYour objective is to locate and recover the memory dump of Subject 89.\nThe system has been in stasis for 200 years. Expect corruption and encryption.\n\nStart by exploring the 'sys' directory for access codes."
-            },
-            "sys": {
+            "McMurdo_Station_US": {
                 "type": "dir",
                 "children": {
-                    "boot.log": {
-                        "type": "file",
-                        "content": "[BOOT SEQUENCE INITIATED]\n...\nLoading Kernel... OK\nLoading User Profile... ERROR\nProfile Corrupted. Reverting to default.\n\n[WARNING] Legacy encryption detected on sector_01.\nMaster Key Fragment found in memory: 'AETHER'"
+                    "public": {
+                        "type": "dir",
+                        "children": {
+                            "weather_data": {
+                                "type": "dir",
+                                "children": {
+                                    "2157_09_01.log": {
+                                        "type": "file",
+                                        "content": "DATE: 2157-09-01\nTEMP: -45C\nWIND: 80km/h NE\nVISIBILITY: 50m\nNOTE: Storm approaching from sector 4."
+                                    },
+                                    "2157_09_02.log": {
+                                        "type": "file",
+                                        "content": "DATE: 2157-09-02\nTEMP: -48C\nWIND: 110km/h NE\nVISIBILITY: 0m\nNOTE: External sensors offline."
+                                    }
+                                }
+                            },
+                            "supply_logs": {
+                                "type": "dir",
+                                "children": {
+                                    "inventory_check.txt": {
+                                        "type": "file",
+                                        "content": "Food Rations: 45% (CRITICAL)\nFuel Cells: 60%\nMedical Supplies: 30%\n\nWARNING: Next supply drop is 2 weeks overdue."
+                                    }
+                                }
+                            },
+                            "personnel_records": {
+                                "type": "dir",
+                                "children": {
+                                    "staff_list.txt": {
+                                        "type": "file",
+                                        "content": "Commander: J. Miller\nChief Scientist: Dr. A. Kovacs\nMedical Officer: Dr. S. Chen\nEngineer: M. Rossi\n..."
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "network.cfg": {
-                        "type": "file",
-                        "content": "IP: 192.168.0.1\nGATEWAY: 192.168.0.254\nSTATUS: OFFLINE"
-                    }
-                }
-            },
-            "sector_01": {
-                "type": "dir",
-                "children": {
-                    "memory_dump.enc": {
-                        "type": "file",
-                        "encrypted": true,
-                        "password": "AETHER",
-                        "content": "SUBJECT 89 // MEMORY FRAGMENT\n\nI don't know if anyone will read this. The world outside has gone silent.\nThey told us the Substrate would save us, but it only preserved our ghosts.\nIf you are reading this, I am already code.\n\n[END OF DATA]\n\nCONGRATULATIONS, OPERATOR. DEMO COMPLETE."
+                    "research": {
+                        "type": "dir",
+                        "children": {
+                            "biology": {
+                                "type": "dir",
+                                "children": {
+                                    "anomaly_report.txt": {
+                                        "type": "file",
+                                        "content": "REPORT ID: BIO-992\nSUBJECT: Unknown biological samples from ice core 774.\n\nCellular structure does not match any known terrestrial organism.\nRapid cell division observed even at -50C.\nRequesting immediate quarantine of Sector 4.\n\n(Trigger for Phase 2)"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

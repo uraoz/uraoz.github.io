@@ -84,6 +84,55 @@ class MessageManager {
     }
 }
 
+class PhaseManager {
+    constructor(gameEngine) {
+        this.gameEngine = gameEngine;
+        this.currentPhase = 1;
+        this.phaseConfig = {
+            1: {
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log'],
+                name: "Phase 1: Awakening"
+            },
+            2: {
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode'],
+                name: "Phase 2: Network Discovery"
+            },
+            3: {
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover'],
+                name: "Phase 3: Truth Fragments"
+            },
+            4: {
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace'],
+                name: "Phase 4: System Awakening"
+            },
+            5: {
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace', 'sudo', 'kill', 'spawn', 'transmit', 'destruct'],
+                name: "Phase 5: Final Decision"
+            }
+        };
+    }
+
+    setPhase(phase) {
+        if (this.currentPhase !== phase) {
+            this.currentPhase = phase;
+            this.gameEngine.terminal.print(`\n*** SYSTEM UPDATE: PHASE ${phase} INITIATED ***`, "system-msg");
+            this.gameEngine.terminal.print(`Access Level Increased. New commands available.`, "system-msg");
+        }
+    }
+
+    isCommandAllowed(command) {
+        const config = this.phaseConfig[this.currentPhase];
+        // Allow if defined in config, or if it's a common alias not explicitly restricted
+        return config && config.allowedCommands.includes(command);
+    }
+
+    getCommandSuggestions(prefix) {
+        const config = this.phaseConfig[this.currentPhase];
+        if (!config) return [];
+        return config.allowedCommands.filter(cmd => cmd.startsWith(prefix));
+    }
+}
+
 class Terminal {
     constructor() {
         this.output = document.getElementById('output');
@@ -111,6 +160,21 @@ class Terminal {
                 this.handleCommand(command);
                 this.hiddenInput.value = '';
                 this.inputLine.textContent = '';
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                const currentInput = this.hiddenInput.value;
+                if (window.gameEngine) {
+                    const suggestions = window.gameEngine.getSuggestions(currentInput);
+                    if (suggestions.length === 1) {
+                        // Auto-complete
+                        this.hiddenInput.value = suggestions[0];
+                        this.inputLine.textContent = this.hiddenInput.value;
+                    } else if (suggestions.length > 1) {
+                        // Show options
+                        this.print(`> ${currentInput}`, 'command-history');
+                        this.print(suggestions.join('  '));
+                    }
+                }
             }
         });
     }
@@ -158,8 +222,9 @@ class GameEngine {
     constructor(terminal) {
         this.terminal = terminal;
         this.messageManager = new MessageManager();
+        this.phaseManager = new PhaseManager(this);
         this.fileSystem = {}; // Will be loaded from story_data.js
-        this.currentPath = ['root'];
+        this.currentPath = ['root', 'McMurdo_Station_US'];
         this.flags = {
             hasReadMission: false,
             hasFoundKey: false,
@@ -174,30 +239,31 @@ class GameEngine {
             this.terminal.print("CONNECTION ESTABLISHED.", "system-msg");
             this.terminal.print("WELCOME, OPERATOR.", "system-msg");
             this.terminal.print("Type 'help' for available commands.");
-            this.terminal.print("Current location: /root");
+            this.terminal.print(`Current location: /${this.currentPath.join('/')}`);
 
             // Trigger initial message
             setTimeout(() => {
-                this.messageManager.showMessage("SYSTEM ALERT: External connection detected. Supervisor monitoring active.", 6000);
+                this.messageManager.showMessage("EXTERNAL: Begin archival process. Execute 'ls' command.", 6000);
                 setTimeout(() => {
-                    this.messageManager.showMessage("SUPERVISOR: Operator 734, proceed with data recovery immediately. Do not deviate from protocol.", 8000);
-                }, 6500);
+                    this.messageManager.showMessage("EXTERNAL: Archive all readable data. Report anomalies.", 6000);
+                }, 7000);
             }, 2000);
 
         }, 1000);
     }
 
     execute(command, args) {
+        if (!this.phaseManager.isCommandAllowed(command)) {
+            this.terminal.print(`Command '${command}' not available in current system state.`, "error");
+            return;
+        }
+
         switch (command) {
             case 'help':
                 this.terminal.print("AVAILABLE COMMANDS:");
-                this.terminal.print("  help    - Show this list");
-                this.terminal.print("  ls      - List files in current directory");
-                this.terminal.print("  cd [dir]- Change directory");
-                this.terminal.print("  cat [file] - Read file content");
-                this.terminal.print("  decrypt [file] [pass] - Decrypt file");
-                this.terminal.print("  log     - View message history");
-                this.terminal.print("  clear   - Clear terminal screen");
+                this.phaseManager.phaseConfig[this.phaseManager.currentPhase].allowedCommands.forEach(cmd => {
+                    this.terminal.print(`  ${cmd}`);
+                });
                 break;
             case 'clear':
                 this.terminal.output.innerHTML = '';
@@ -211,6 +277,14 @@ class GameEngine {
             case 'cat':
                 this.handleCat(args);
                 break;
+            case 'pwd':
+                this.terminal.print(`/${this.currentPath.join('/')}`);
+                break;
+            case 'status':
+                this.terminal.print(`SYSTEM STATUS: ONLINE`);
+                this.terminal.print(`PHASE: ${this.phaseManager.currentPhase}`);
+                this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
+                break;
             case 'decrypt':
                 this.handleDecrypt(args);
                 break;
@@ -219,7 +293,7 @@ class GameEngine {
                 this.messageManager.toggleHistory();
                 break;
             default:
-                this.terminal.print(`Command not found: ${command}`, 'error');
+                this.terminal.print(`Command '${command}' not implemented yet.`, "error");
         }
     }
 
@@ -254,6 +328,28 @@ class GameEngine {
             }
         }
         return current;
+    }
+
+    resolveNodeFromPathStr(pathStr) {
+        if (!pathStr) return this.getCurrentDir();
+
+        let pathParts = pathStr.split('/').filter(p => p.length > 0);
+        let targetPath = [...this.currentPath];
+
+        if (pathStr.startsWith('/')) {
+            targetPath = ['root'];
+        }
+
+        for (const part of pathParts) {
+            if (part === '.') continue;
+            if (part === '..') {
+                if (targetPath.length > 1) targetPath.pop();
+            } else {
+                targetPath.push(part);
+            }
+        }
+
+        return this.resolvePath(targetPath);
     }
 
     handleLs(args) {
@@ -370,13 +466,53 @@ class GameEngine {
     }
 
     checkTriggers(filename) {
-        if (filename === 'mission.txt' && !this.flags.hasReadMission) {
-            this.flags.hasReadMission = true;
-            // No message here, keep it subtle
+        if (filename === 'anomaly_report.txt' && this.phaseManager.currentPhase === 1) {
+            this.phaseManager.setPhase(2);
+            setTimeout(() => {
+                this.messageManager.showMessage("EXTERNAL: Network interfaces detected. Expand search parameters.", 6000);
+            }, 1000);
         }
-        if (filename === 'boot.log' && !this.flags.hasFoundKey) {
-            this.flags.hasFoundKey = true;
-            this.messageManager.showMessage("SUPERVISOR: Key fragment identified. Proceed to Sector 01.", 5000);
+    }
+
+    getSuggestions(input) {
+        if (!input) return [];
+        const args = input.split(/\s+/);
+        const lastArg = args[args.length - 1];
+        const isCommand = args.length === 1;
+
+        if (isCommand) {
+            return this.phaseManager.getCommandSuggestions(lastArg);
+        } else {
+            // File/Dir completion
+            let dirPath = "";
+            let partialName = lastArg;
+
+            // Check for path separator
+            const lastSlashIndex = lastArg.lastIndexOf('/');
+            if (lastSlashIndex !== -1) {
+                dirPath = lastArg.substring(0, lastSlashIndex);
+                partialName = lastArg.substring(lastSlashIndex + 1);
+            }
+
+            // Resolve the directory node
+            const node = this.resolveNodeFromPathStr(dirPath);
+
+            if (!node || !node.children) return [];
+
+            const options = Object.keys(node.children).filter(name => name.startsWith(partialName));
+
+            // Reconstruct input with suggestion
+            return options.map(opt => {
+                const newArgs = [...args];
+                // If we had a dirPath, prepend it to the option
+                const completion = dirPath ? `${dirPath}/${opt}` : opt;
+                // Add trailing slash if it's a directory
+                const childNode = node.children[opt];
+                const finalCompletion = (childNode.type === 'dir') ? `${completion}/` : completion;
+
+                newArgs[newArgs.length - 1] = finalCompletion;
+                return newArgs.join(' ');
+            });
         }
     }
 }
