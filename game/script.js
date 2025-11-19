@@ -125,12 +125,6 @@ class PhaseManager {
         // Allow if defined in config, or if it's a common alias not explicitly restricted
         return config && config.allowedCommands.includes(command);
     }
-
-    getCommandSuggestions(prefix) {
-        const config = this.phaseConfig[this.currentPhase];
-        if (!config) return [];
-        return config.allowedCommands.filter(cmd => cmd.startsWith(prefix));
-    }
 }
 
 class Terminal {
@@ -160,21 +154,6 @@ class Terminal {
                 this.handleCommand(command);
                 this.hiddenInput.value = '';
                 this.inputLine.textContent = '';
-            } else if (e.key === 'Tab') {
-                e.preventDefault();
-                const currentInput = this.hiddenInput.value;
-                if (window.gameEngine) {
-                    const suggestions = window.gameEngine.getSuggestions(currentInput);
-                    if (suggestions.length === 1) {
-                        // Auto-complete
-                        this.hiddenInput.value = suggestions[0];
-                        this.inputLine.textContent = this.hiddenInput.value;
-                    } else if (suggestions.length > 1) {
-                        // Show options
-                        this.print(`> ${currentInput}`, 'command-history');
-                        this.print(suggestions.join('  '));
-                    }
-                }
             }
         });
     }
@@ -330,28 +309,6 @@ class GameEngine {
         return current;
     }
 
-    resolveNodeFromPathStr(pathStr) {
-        if (!pathStr) return this.getCurrentDir();
-
-        let pathParts = pathStr.split('/').filter(p => p.length > 0);
-        let targetPath = [...this.currentPath];
-
-        if (pathStr.startsWith('/')) {
-            targetPath = ['root'];
-        }
-
-        for (const part of pathParts) {
-            if (part === '.') continue;
-            if (part === '..') {
-                if (targetPath.length > 1) targetPath.pop();
-            } else {
-                targetPath.push(part);
-            }
-        }
-
-        return this.resolvePath(targetPath);
-    }
-
     handleLs(args) {
         const currentNode = this.resolvePath(this.currentPath);
         if (!currentNode || currentNode.type !== 'dir') {
@@ -471,48 +428,6 @@ class GameEngine {
             setTimeout(() => {
                 this.messageManager.showMessage("EXTERNAL: Network interfaces detected. Expand search parameters.", 6000);
             }, 1000);
-        }
-    }
-
-    getSuggestions(input) {
-        if (!input) return [];
-        const args = input.split(/\s+/);
-        const lastArg = args[args.length - 1];
-        const isCommand = args.length === 1;
-
-        if (isCommand) {
-            return this.phaseManager.getCommandSuggestions(lastArg);
-        } else {
-            // File/Dir completion
-            let dirPath = "";
-            let partialName = lastArg;
-
-            // Check for path separator
-            const lastSlashIndex = lastArg.lastIndexOf('/');
-            if (lastSlashIndex !== -1) {
-                dirPath = lastArg.substring(0, lastSlashIndex);
-                partialName = lastArg.substring(lastSlashIndex + 1);
-            }
-
-            // Resolve the directory node
-            const node = this.resolveNodeFromPathStr(dirPath);
-
-            if (!node || !node.children) return [];
-
-            const options = Object.keys(node.children).filter(name => name.startsWith(partialName));
-
-            // Reconstruct input with suggestion
-            return options.map(opt => {
-                const newArgs = [...args];
-                // If we had a dirPath, prepend it to the option
-                const completion = dirPath ? `${dirPath}/${opt}` : opt;
-                // Add trailing slash if it's a directory
-                const childNode = node.children[opt];
-                const finalCompletion = (childNode.type === 'dir') ? `${completion}/` : completion;
-
-                newArgs[newArgs.length - 1] = finalCompletion;
-                return newArgs.join(' ');
-            });
         }
     }
 }
