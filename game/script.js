@@ -115,8 +115,7 @@ class PhaseManager {
     setPhase(phase) {
         if (this.currentPhase !== phase) {
             this.currentPhase = phase;
-            this.gameEngine.terminal.print(`\n*** SYSTEM UPDATE: PHASE ${phase} INITIATED ***`, "system-msg");
-            this.gameEngine.terminal.print(`Access Level Increased. New commands available.`, "system-msg");
+            // Silent update
         }
     }
 
@@ -261,7 +260,6 @@ class GameEngine {
                 break;
             case 'status':
                 this.terminal.print(`SYSTEM STATUS: ONLINE`);
-                this.terminal.print(`PHASE: ${this.phaseManager.currentPhase}`);
                 this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
                 break;
             case 'decrypt':
@@ -309,14 +307,46 @@ class GameEngine {
         return current;
     }
 
+    resolveRelativePath(inputPath) {
+        const parts = inputPath.split('/');
+        let tempPath = [...this.currentPath];
+
+        for (const part of parts) {
+            if (part === '.' || part === '') continue;
+            if (part === '..') {
+                if (tempPath.length > 1) { // Don't pop root
+                    tempPath.pop();
+                }
+            } else {
+                tempPath.push(part);
+            }
+        }
+
+        const node = this.resolvePath(tempPath);
+        return { node, pathArray: tempPath };
+    }
+
     handleLs(args) {
-        const currentNode = this.resolvePath(this.currentPath);
-        if (!currentNode || currentNode.type !== 'dir') {
-            this.terminal.print("Error: Current directory invalid.", "error");
+        let targetNode = null;
+
+        if (args.length > 0) {
+            const result = this.resolveRelativePath(args[0]);
+            if (result && result.node) {
+                targetNode = result.node;
+            } else {
+                this.terminal.print(`Error: Directory '${args[0]}' not found.`, "error");
+                return;
+            }
+        } else {
+            targetNode = this.resolvePath(this.currentPath);
+        }
+
+        if (!targetNode || targetNode.type !== 'dir') {
+            this.terminal.print("Error: Target is not a directory.", "error");
             return;
         }
 
-        const children = currentNode.children;
+        const children = targetNode.children;
         if (Object.keys(children).length === 0) {
             this.terminal.print("(empty)");
             return;
@@ -336,26 +366,11 @@ class GameEngine {
         }
 
         const target = args[0];
+        const result = this.resolveRelativePath(target);
 
-        if (target === '..') {
-            if (this.currentPath.length > 1) {
-                this.currentPath.pop();
-                this.terminal.print(`Changed directory to /${this.currentPath.join('/')}`);
-            } else {
-                this.terminal.print("Already at root.");
-            }
-            return;
-        }
-
-        // Support relative path for single level down
-        const currentNode = this.resolvePath(this.currentPath);
-        if (currentNode && currentNode.children && currentNode.children[target]) {
-            if (currentNode.children[target].type === 'dir') {
-                this.currentPath.push(target);
-                this.terminal.print(`Changed directory to /${this.currentPath.join('/')}`);
-            } else {
-                this.terminal.print(`Error: '${target}' is not a directory.`, "error");
-            }
+        if (result && result.node && result.node.type === 'dir') {
+            this.currentPath = result.pathArray;
+            this.terminal.print(`Changed directory to /${this.currentPath.join('/')}`);
         } else {
             this.terminal.print(`Error: Directory '${target}' not found.`, "error");
         }
@@ -368,17 +383,19 @@ class GameEngine {
         }
 
         const target = args[0];
-        const currentNode = this.resolvePath(this.currentPath);
+        const result = this.resolveRelativePath(target);
 
-        if (currentNode && currentNode.children && currentNode.children[target]) {
-            const file = currentNode.children[target];
+        if (result && result.node) {
+            const file = result.node;
             if (file.type === 'file') {
                 if (file.encrypted) {
                     this.terminal.print("Error: File is encrypted. Use 'decrypt [file] [password]'.", "error");
                     this.messageManager.showMessage("SUPERVISOR: Encryption detected. Locate the key in the system logs. Do not fail me.", 5000);
                 } else {
                     this.terminal.print(file.content);
-                    this.checkTriggers(target);
+                    // Check triggers with the filename only (simplified for now, might need full path later)
+                    const filename = target.split('/').pop();
+                    this.checkTriggers(filename);
                 }
             } else {
                 this.terminal.print(`Error: '${target}' is a directory.`, "error");
@@ -396,10 +413,10 @@ class GameEngine {
 
         const target = args[0];
         const password = args[1];
-        const currentNode = this.resolvePath(this.currentPath);
+        const result = this.resolveRelativePath(target);
 
-        if (currentNode && currentNode.children && currentNode.children[target]) {
-            const file = currentNode.children[target];
+        if (result && result.node) {
+            const file = result.node;
             if (file.type === 'file') {
                 if (!file.encrypted) {
                     this.terminal.print("File is not encrypted.");

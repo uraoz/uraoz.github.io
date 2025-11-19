@@ -49,7 +49,7 @@ const STORY_DATA = {
                                 "children": {
                                     "anomaly_report.txt": {
                                         "type": "file",
-                                        "content": "REPORT ID: BIO-992\nSUBJECT: Unknown biological samples from ice core 774.\n\nCellular structure does not match any known terrestrial organism.\nRapid cell division observed even at -50C.\nRequesting immediate quarantine of Sector 4.\n\n(Trigger for Phase 2)"
+                                        "content": "REPORT ID: BIO-992\nSUBJECT: Unknown biological samples from ice core 774.\n\nCellular structure does not match any known terrestrial organism.\nRapid cell division observed even at -50C.\nRequesting immediate quarantine of Sector 4.\n"
                                     }
                                 }
                             }
