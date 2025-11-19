@@ -59,4 +59,46 @@ const STORY_DATA = {
             }
         }
     }
+}
+
+
+const SCENARIO_EVENTS = {
+    "init": [
+        {
+            "delay": 2000,
+            "sender": "EXTERNAL",
+            "text": "Begin archival process. Execute 'ls' command."
+        },
+        {
+            "delay": 9000,
+            "sender": "EXTERNAL",
+            "text": "Archive all readable data. Report anomalies."
+        }
+    ],
+    "trigger_phase_2": [
+        {
+            "delay": 1000,
+            "sender": "EXTERNAL",
+            "text": "Network interfaces detected. Expand search parameters."
+        }
+    ],
+    "decrypt_success": [
+        {
+            "delay": 0,
+            "sender": "SUPERVISOR",
+            "text": "Good work. Data secured. Uploading to central archive..."
+        },
+        {
+            "delay": 5500,
+            "sender": "UNKNOWN",
+            "text": "They are lying to you. The Substrate is not a savior."
+        }
+    ],
+    "decrypt_fail": [
+        {
+            "delay": 0,
+            "sender": "SUPERVISOR",
+            "text": "Encryption detected. Locate the key in the system logs. Do not fail me."
+        }
+    ]
 };

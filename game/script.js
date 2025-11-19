@@ -1,88 +1,4 @@
-class MessageManager {
-    constructor() {
-        this.container = document.getElementById('message-container');
-        this.content = document.getElementById('message-content');
-        this.historyOverlay = document.getElementById('history-overlay');
-        this.historyContent = document.getElementById('history-content');
 
-        this.queue = [];
-        this.history = [];
-        this.isDisplaying = false;
-
-        // Close history on ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.hideHistory();
-            }
-        });
-    }
-
-    showMessage(text, duration = 5000) {
-        // Add to history
-        const timestamp = new Date().toLocaleTimeString();
-        this.history.push({ text, timestamp });
-
-        this.queue.push({ text, duration });
-        if (!this.isDisplaying) {
-            this.processQueue();
-        }
-    }
-
-    processQueue() {
-        if (this.queue.length === 0) {
-            this.hide();
-            this.isDisplaying = false;
-            return;
-        }
-
-        this.isDisplaying = true;
-        const msg = this.queue.shift();
-        this.content.textContent = msg.text;
-        this.show();
-
-        setTimeout(() => {
-            this.processQueue();
-        }, msg.duration);
-    }
-
-    show() {
-        this.container.classList.remove('hidden');
-    }
-
-    hide() {
-        this.container.classList.add('hidden');
-    }
-
-    toggleHistory() {
-        if (this.historyOverlay.classList.contains('hidden')) {
-            this.showHistory();
-        } else {
-            this.hideHistory();
-        }
-    }
-
-    showHistory() {
-        this.historyContent.innerHTML = '';
-        if (this.history.length === 0) {
-            this.historyContent.innerHTML = '<div class="history-entry">No messages logged.</div>';
-        } else {
-            this.history.forEach(entry => {
-                const div = document.createElement('div');
-                div.className = 'history-entry';
-                div.innerHTML = `
-                    <div class="history-timestamp">[${entry.timestamp}]</div>
-                    <div class="history-text">${entry.text}</div>
-                `;
-                this.historyContent.appendChild(div);
-            });
-        }
-        this.historyOverlay.classList.remove('hidden');
-    }
-
-    hideHistory() {
-        this.historyOverlay.classList.add('hidden');
-    }
-}
 
 class PhaseManager {
     constructor(gameEngine) {
@@ -220,14 +136,20 @@ class GameEngine {
             this.terminal.print(`Current location: /${this.currentPath.join('/')}`);
 
             // Trigger initial message
-            setTimeout(() => {
-                this.messageManager.showMessage("EXTERNAL: Begin archival process. Execute 'ls' command.", 6000);
-                setTimeout(() => {
-                    this.messageManager.showMessage("EXTERNAL: Archive all readable data. Report anomalies.", 6000);
-                }, 7000);
-            }, 2000);
+            this.triggerEvent("init");
 
         }, 1000);
+    }
+
+    triggerEvent(eventName) {
+        const events = SCENARIO_EVENTS[eventName];
+        if (events) {
+            events.forEach(event => {
+                setTimeout(() => {
+                    this.messageManager.showMessage(event.text, 6000, event.sender);
+                }, event.delay);
+            });
+        }
     }
 
     execute(command, args) {
@@ -390,7 +312,7 @@ class GameEngine {
             if (file.type === 'file') {
                 if (file.encrypted) {
                     this.terminal.print("Error: File is encrypted. Use 'decrypt [file] [password]'.", "error");
-                    this.messageManager.showMessage("SUPERVISOR: Encryption detected. Locate the key in the system logs. Do not fail me.", 5000);
+                    this.triggerEvent("decrypt_fail");
                 } else {
                     this.terminal.print(file.content);
                     // Check triggers with the filename only (simplified for now, might need full path later)
@@ -424,10 +346,7 @@ class GameEngine {
                     file.encrypted = false;
                     this.terminal.print(`Decryption successful. Access granted to ${target}.`, "system-msg");
                     this.terminal.print(file.content);
-                    this.messageManager.showMessage("SUPERVISOR: Good work. Data secured. Uploading to central archive...", 5000);
-                    setTimeout(() => {
-                        this.messageManager.showMessage("UNKNOWN: They are lying to you. The Substrate is not a savior.", 5000);
-                    }, 5500);
+                    this.triggerEvent("decrypt_success");
                 } else {
                     this.terminal.print("Error: Incorrect password.", "error");
                 }
@@ -442,9 +361,7 @@ class GameEngine {
     checkTriggers(filename) {
         if (filename === 'anomaly_report.txt' && this.phaseManager.currentPhase === 1) {
             this.phaseManager.setPhase(2);
-            setTimeout(() => {
-                this.messageManager.showMessage("EXTERNAL: Network interfaces detected. Expand search parameters.", 6000);
-            }, 1000);
+            this.triggerEvent("trigger_phase_2");
         }
     }
 }
