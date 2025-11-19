@@ -38,12 +38,40 @@ class MessageManager {
 
         this.isDisplaying = true;
         const msg = this.queue.shift();
-        this.content.textContent = msg.text;
         this.show();
+        this.decodeEffect(msg.text, this.content, () => {
+            setTimeout(() => {
+                this.processQueue();
+            }, msg.duration);
+        });
+    }
 
-        setTimeout(() => {
-            this.processQueue();
-        }, msg.duration);
+    decodeEffect(text, element, callback) {
+        const chars = '!@#$%^&*()_+-=[]{}|;:,.<>/?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let iterations = 0;
+        const maxIterations = 3; // How many times to scramble each character
+
+        // Clear content initially
+        element.textContent = '';
+
+        const interval = setInterval(() => {
+            element.textContent = text.split('')
+                .map((letter, index) => {
+                    if (index < iterations) {
+                        return text[index];
+                    }
+                    return chars[Math.floor(Math.random() * chars.length)];
+                })
+                .join('');
+
+            if (iterations >= text.length) {
+                clearInterval(interval);
+                element.textContent = text; // Ensure final text is correct
+                if (callback) callback();
+            }
+
+            iterations += 1 / 2; // Speed of decoding (smaller = slower)
+        }, 30);
     }
 
     show() {
