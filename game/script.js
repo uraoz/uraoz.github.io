@@ -70,6 +70,42 @@ class Terminal {
                 this.handleCommand(command);
                 this.hiddenInput.value = '';
                 this.updateInputDisplay();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (this.history.length > 0) {
+                    if (this.historyIndex === -1) {
+                        // First time pressing up, save current input
+                        this.currentInput = this.hiddenInput.value;
+                        this.historyIndex = this.history.length - 1;
+                    } else if (this.historyIndex > 0) {
+                        this.historyIndex--;
+                    }
+                    this.hiddenInput.value = this.history[this.historyIndex];
+                    this.updateInputDisplay();
+                    // Move cursor to end
+                    setTimeout(() => {
+                        this.hiddenInput.selectionStart = this.hiddenInput.value.length;
+                        this.hiddenInput.selectionEnd = this.hiddenInput.value.length;
+                    }, 0);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (this.historyIndex !== -1) {
+                    if (this.historyIndex < this.history.length - 1) {
+                        this.historyIndex++;
+                        this.hiddenInput.value = this.history[this.historyIndex];
+                    } else {
+                        // Reached the end, restore current input
+                        this.historyIndex = -1;
+                        this.hiddenInput.value = this.currentInput || '';
+                    }
+                    this.updateInputDisplay();
+                    // Move cursor to end
+                    setTimeout(() => {
+                        this.hiddenInput.selectionStart = this.hiddenInput.value.length;
+                        this.hiddenInput.selectionEnd = this.hiddenInput.value.length;
+                    }, 0);
+                }
             }
         });
     }
@@ -132,6 +168,10 @@ class Terminal {
         this.print(`> ${cmd}`, 'command-history');
 
         if (cmd.trim() === '') return;
+
+        // Add to history if not empty
+        this.history.push(cmd);
+        this.historyIndex = -1; // Reset history navigation
 
         const args = cmd.trim().split(/\s+/);
         const command = args.shift().toLowerCase();
