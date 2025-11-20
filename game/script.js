@@ -54,23 +54,55 @@ class Terminal {
 
         this.setupEventListeners();
         this.focusInput();
+        this.updateInputDisplay();
     }
 
     setupEventListeners() {
         document.addEventListener('click', () => this.focusInput());
 
-        this.hiddenInput.addEventListener('input', (e) => {
-            this.inputLine.textContent = this.hiddenInput.value;
-        });
+        this.hiddenInput.addEventListener('input', () => this.updateInputDisplay());
+        this.hiddenInput.addEventListener('keyup', () => this.updateInputDisplay());
+        this.hiddenInput.addEventListener('click', () => this.updateInputDisplay());
 
         this.hiddenInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const command = this.hiddenInput.value;
                 this.handleCommand(command);
                 this.hiddenInput.value = '';
-                this.inputLine.textContent = '';
+                this.updateInputDisplay();
             }
         });
+    }
+
+    escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    updateInputDisplay() {
+        const text = this.hiddenInput.value;
+        const cursorIndex = this.hiddenInput.selectionStart;
+
+        // Hide static cursor if it exists
+        const staticCursor = document.getElementById('cursor');
+        if (staticCursor) staticCursor.style.display = 'none';
+
+        let html = '';
+        if (cursorIndex >= text.length) {
+            // Cursor at end
+            html = this.escapeHtml(text) + '<span class="cursor-active">&nbsp;</span>';
+        } else {
+            // Cursor in middle
+            const before = text.substring(0, cursorIndex);
+            const char = text.substring(cursorIndex, cursorIndex + 1);
+            const after = text.substring(cursorIndex + 1);
+            html = this.escapeHtml(before) + '<span class="cursor-active">' + this.escapeHtml(char) + '</span>' + this.escapeHtml(after);
+        }
+        this.inputLine.innerHTML = html;
     }
 
     focusInput() {

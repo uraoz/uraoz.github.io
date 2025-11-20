@@ -82,8 +82,23 @@ body {
     margin-right: 10px;
 }
 
-#cursor {
+/* Cursor Styling */
+.cursor-active {
+    position: relative;
+    display: inline-block;
+    min-width: 1ch;
+}
+
+.cursor-active::after {
+    content: '█';
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: var(--term-bg);
+    color: var(--term-color);
     animation: blink 1s step-end infinite;
+    width: 100%;
+    height: 100%;
 }
 
 @keyframes blink {
