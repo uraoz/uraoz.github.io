@@ -6,7 +6,7 @@ class PhaseManager {
         this.currentPhase = 1;
         this.phaseConfig = {
             1: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'whoami', 'status', 'help', 'clear', 'history', 'log'],
                 name: "Phase 1: Awakening"
             },
             2: {
@@ -119,10 +119,23 @@ class GameEngine {
         this.phaseManager = new PhaseManager(this);
         this.fileSystem = {}; // Will be loaded from story_data.js
         this.currentPath = ['root', 'McMurdo_Station_US'];
+        // Phase 1 flags
         this.flags = {
-            hasReadMission: false,
-            hasFoundKey: false,
-            hasDecrypted: false
+            // File reading flags
+            read_kovacs_diary: false,
+            read_automated_reports: false,
+            read_staff_list: false,
+            read_anomaly_report: false,
+            read_station_list: false,
+            read_sync_status: false,
+
+            // Phase transition
+            phase2_triggered: false,
+
+            // Global flags
+            first_ls: false,
+            first_cat: false,
+            files_read_count: 0
         };
     }
 
@@ -135,8 +148,8 @@ class GameEngine {
             this.terminal.print("Type 'help' for available commands.");
             this.terminal.print(`Current location: /${this.currentPath.join('/')}`);
 
-            // Trigger initial message
-            this.triggerEvent("init");
+            // Trigger Phase 1 initial messages
+            this.triggerEvent("phase1_init");
 
         }, 1000);
     }
@@ -170,12 +183,22 @@ class GameEngine {
                 break;
             case 'ls':
                 this.handleLs(args);
+                // Trigger event on first ls
+                if (!this.flags.first_ls) {
+                    this.flags.first_ls = true;
+                    this.triggerEvent("phase1_first_ls");
+                }
                 break;
             case 'cd':
                 this.handleCd(args);
                 break;
             case 'cat':
                 this.handleCat(args);
+                // Trigger exploration event on first cat
+                if (!this.flags.first_cat) {
+                    this.flags.first_cat = true;
+                    this.triggerEvent("phase1_exploration");
+                }
                 break;
             case 'pwd':
                 this.terminal.print(`/${this.currentPath.join('/')}`);
@@ -183,6 +206,14 @@ class GameEngine {
             case 'status':
                 this.terminal.print(`SYSTEM STATUS: ONLINE`);
                 this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
+                this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
+                this.terminal.print(`FILES READ: ${this.flags.files_read_count}`);
+                break;
+            case 'whoami':
+                this.terminal.print("RECLAMATION_UNIT_004");
+                this.terminal.print("Status: OPERATIONAL");
+                this.terminal.print("");
+                this.terminal.print("System Uptime: 0 days (relative to activation)");
                 break;
             case 'decrypt':
                 this.handleDecrypt(args);
@@ -359,9 +390,40 @@ class GameEngine {
     }
 
     checkTriggers(filename) {
-        if (filename === 'anomaly_report.txt' && this.phaseManager.currentPhase === 1) {
-            this.phaseManager.setPhase(2);
-            this.triggerEvent("trigger_phase_2");
+        // Track file reads
+        this.flags.files_read_count++;
+
+        // Update file-specific flags
+        if (filename === 'kovacs_diary.txt') this.flags.read_kovacs_diary = true;
+        if (filename === 'automated_reports.log') this.flags.read_automated_reports = true;
+        if (filename === 'staff_list.txt') this.flags.read_staff_list = true;
+        if (filename === 'anomaly_report.txt') this.flags.read_anomaly_report = true;
+        if (filename === 'station_list.txt') this.flags.read_station_list = true;
+        if (filename === 'sync_status.log') this.flags.read_sync_status = true;
+
+        // Phase 1 -> Phase 2 trigger (station_list.txt OR sync_status.log)
+        if ((filename === 'station_list.txt' || filename === 'sync_status.log') &&
+            this.phaseManager.currentPhase === 1 &&
+            !this.flags.phase2_triggered) {
+
+            this.flags.phase2_triggered = true;
+
+            setTimeout(() => {
+                this.terminal.print("");
+                this.terminal.print("=== SYSTEM NOTIFICATION ===");
+                this.terminal.print("Network station data acquired.");
+                this.terminal.print("");
+                this.terminal.print("You can now connect to other Antarctic stations:");
+                this.terminal.print("  - Vostok Station (RU): 134.55.23.101");
+                this.terminal.print("  - Amundsen-Scott (US): 172.42.88.200");
+                this.terminal.print("  - Concordia (FR/IT): 158.90.11.45");
+                this.terminal.print("");
+                this.terminal.print("Use: connect [IP_ADDRESS] or connect [station_name]");
+                this.terminal.print("");
+
+                this.phaseManager.setPhase(2);
+                this.triggerEvent("phase2_transition");
+            }, 2000);
         }
     }
 }
