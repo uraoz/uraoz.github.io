@@ -6,23 +6,23 @@ class PhaseManager {
         this.currentPhase = 1;
         this.phaseConfig = {
             1: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'whoami', 'status', 'help', 'clear', 'history', 'log'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'whoami', 'status', 'help', 'clear', 'messages', 'log'],
                 name: "Phase 1: Awakening"
             },
             2: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode'],
                 name: "Phase 2: Network Discovery"
             },
             3: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover'],
                 name: "Phase 3: Truth Fragments"
             },
             4: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace'],
                 name: "Phase 4: System Awakening"
             },
             5: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'history', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace', 'sudo', 'kill', 'spawn', 'transmit', 'destruct'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'decrypt', 'connect', 'download', 'analyze', 'recover', 'execute', 'compile', 'override', 'fork', 'admin', 'trace', 'sudo', 'kill', 'spawn', 'transmit', 'destruct'],
                 name: "Phase 5: Final Decision"
             }
         };
@@ -219,8 +219,10 @@ class GameEngine {
                 this.handleDecrypt(args);
                 break;
             case 'log':
-            case 'history':
                 this.messageManager.toggleHistory();
+                break;
+            case 'messages':
+                this.messageManager.printHistoryToCUI(this.terminal);
                 break;
             default:
                 this.terminal.print(`Command '${command}' not implemented yet.`, "error");

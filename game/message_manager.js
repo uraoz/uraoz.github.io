@@ -111,4 +111,18 @@ class MessageManager {
     hideHistory() {
         this.historyOverlay.classList.add('hidden');
     }
+
+    printHistoryToCUI(terminal) {
+        if (this.history.length === 0) {
+            terminal.print('No notification messages received.', 'system-msg');
+            return;
+        }
+
+        terminal.print('=== NOTIFICATION MESSAGE HISTORY ===', 'system-msg');
+        terminal.print('');
+        this.history.forEach(entry => {
+            terminal.print(`[${entry.timestamp}] ${entry.text}`);
+        });
+        terminal.print('');
+    }
 }
