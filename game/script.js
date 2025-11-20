@@ -70,6 +70,9 @@ class Terminal {
                 this.handleCommand(command);
                 this.hiddenInput.value = '';
                 this.updateInputDisplay();
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                this.handleTabCompletion();
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 if (this.history.length > 0) {
@@ -139,6 +142,136 @@ class Terminal {
             html = this.escapeHtml(before) + '<span class="cursor-active">' + this.escapeHtml(char) + '</span>' + this.escapeHtml(after);
         }
         this.inputLine.innerHTML = html;
+    }
+
+    handleTabCompletion() {
+        const input = this.hiddenInput.value;
+        const cursorPos = this.hiddenInput.selectionStart;
+
+        // Get the text up to the cursor
+        const textBeforeCursor = input.substring(0, cursorPos);
+        const textAfterCursor = input.substring(cursorPos);
+
+        // Split into parts
+        const parts = textBeforeCursor.split(/\s+/);
+        const currentPart = parts[parts.length - 1];
+        const isFirstWord = parts.length === 1 || (parts.length === 2 && textBeforeCursor.endsWith(' ') === false);
+
+        let candidates = [];
+
+        if (isFirstWord && !textBeforeCursor.includes(' ')) {
+            // Complete command
+            if (window.gameEngine) {
+                const allowedCommands = window.gameEngine.phaseManager.phaseConfig[window.gameEngine.phaseManager.currentPhase].allowedCommands;
+                candidates = allowedCommands.filter(cmd => cmd.startsWith(currentPart));
+            }
+        } else {
+            // Complete file/directory name
+            if (window.gameEngine) {
+                candidates = this.getFileCompletions(currentPart);
+            }
+        }
+
+        if (candidates.length === 0) {
+            // No matches, do nothing
+            return;
+        } else if (candidates.length === 1) {
+            // Single match, auto-complete
+            const beforeCurrentPart = textBeforeCursor.substring(0, textBeforeCursor.length - currentPart.length);
+            const newValue = beforeCurrentPart + candidates[0] + textAfterCursor;
+            this.hiddenInput.value = newValue;
+
+            // Set cursor position after the completed part
+            const newCursorPos = beforeCurrentPart.length + candidates[0].length;
+            setTimeout(() => {
+                this.hiddenInput.selectionStart = newCursorPos;
+                this.hiddenInput.selectionEnd = newCursorPos;
+                this.updateInputDisplay();
+            }, 0);
+        } else {
+            // Multiple matches, show them
+            this.print('');
+            this.print(candidates.join('  '));
+
+            // Find common prefix
+            const commonPrefix = this.findCommonPrefix(candidates);
+            if (commonPrefix.length > currentPart.length) {
+                // Complete to common prefix
+                const beforeCurrentPart = textBeforeCursor.substring(0, textBeforeCursor.length - currentPart.length);
+                const newValue = beforeCurrentPart + commonPrefix + textAfterCursor;
+                this.hiddenInput.value = newValue;
+
+                const newCursorPos = beforeCurrentPart.length + commonPrefix.length;
+                setTimeout(() => {
+                    this.hiddenInput.selectionStart = newCursorPos;
+                    this.hiddenInput.selectionEnd = newCursorPos;
+                    this.updateInputDisplay();
+                }, 0);
+            }
+        }
+
+        this.updateInputDisplay();
+    }
+
+    getFileCompletions(prefix) {
+        if (!window.gameEngine) return [];
+
+        // Split prefix into directory path and filename parts
+        const lastSlashIndex = prefix.lastIndexOf('/');
+        let dirPath = '';
+        let filePrefix = prefix;
+
+        if (lastSlashIndex !== -1) {
+            dirPath = prefix.substring(0, lastSlashIndex);
+            filePrefix = prefix.substring(lastSlashIndex + 1);
+        }
+
+        // Get the target directory
+        let targetDir;
+        if (dirPath) {
+            // Navigate to the subdirectory
+            const result = window.gameEngine.resolveRelativePath(dirPath);
+            if (!result || !result.node || result.node.type !== 'dir') {
+                return [];
+            }
+            targetDir = result.node.children;
+        } else {
+            // Use current directory
+            targetDir = window.gameEngine.getCurrentDir();
+        }
+
+        if (!targetDir) return [];
+
+        const candidates = [];
+        Object.keys(targetDir).forEach(name => {
+            if (name.startsWith(filePrefix)) {
+                // Build full path for the candidate
+                const fullPath = dirPath ? dirPath + '/' + name : name;
+
+                // Add trailing slash for directories
+                if (targetDir[name].type === 'dir') {
+                    candidates.push(fullPath + '/');
+                } else {
+                    candidates.push(fullPath);
+                }
+            }
+        });
+
+        return candidates.sort();
+    }
+
+    findCommonPrefix(strings) {
+        if (strings.length === 0) return '';
+        if (strings.length === 1) return strings[0];
+
+        let prefix = strings[0];
+        for (let i = 1; i < strings.length; i++) {
+            while (strings[i].indexOf(prefix) !== 0) {
+                prefix = prefix.substring(0, prefix.length - 1);
+                if (prefix === '') return '';
+            }
+        }
+        return prefix;
     }
 
     focusInput() {
