@@ -1,0 +1,28 @@
+=== DATA REPAIR GUIDE ===
+Concordia Station Backup Recovery
+Version 3.0.1
+
+SITUATION:
+Backup synchronization was interrupted during the events
+of September 3-4, 2157. Some files were only partially
+written before power fluctuation.
+
+RECOVERY PROCEDURE:
+
+Step 1: Identify corrupted files
+        Command: python3 /Concordia_FR_IT/system/scripts/list_corrupted.py
+        This will scan all files and identify corruption
+
+Step 2: Repair each corrupted file individually
+        Command: python3 /Concordia_FR_IT/system/scripts/repair_file.py [filename]
+        The script uses checksums and redundancy to reconstruct data
+
+Step 3: Verify all repairs
+        Command: python3 /Concordia_FR_IT/system/scripts/verify_integrity.py
+        Final check to ensure all files are readable
+
+ESTIMATED TIME: 10-15 minutes
+ESTIMATED CORRUPTED FILES: 3-5 files
+
+NOTE: Most corrupted files are from September 3-4, 2157
+      These files document the final hours.

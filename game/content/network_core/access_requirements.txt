@@ -1,0 +1,33 @@
+=== NETWORK CORE ACCESS REQUIREMENTS ===
+Multi-Station Authentication Protocol
+Established: 2157-02-15
+Security Level: OMEGA
+
+PURPOSE:
+This directory contains Project Lazarus classified data.
+Access requires coordination across all Antarctic stations
+to prevent single-point compromise.
+
+AUTHENTICATION PROTOCOL:
+Each station holds one authentication key in its admin system.
+All four keys must be verified before access is granted.
+
+REQUIRED KEYS:
+✓ McMurdo Station: Admin credentials [RESTORED 2237-08-15]
+✓ Vostok Station: Database integrity [RESTORED 2237-08-15]
+✓ Amundsen Station: Military clearance [RESTORED 2237-08-15]
+✓ Concordia Station: Backup verification [RESTORED 2237-08-15]
+
+STATUS: ALL REQUIREMENTS MET
+ACCESS: GRANTED
+
+CONTENTS:
+- /ai_experiments/ - Four consciousness units (001-004)
+- /project_lazarus/ - Original research and protocols
+- /substrate_interface/ - [LOCKED - Phase 4]
+- /system_core/ - [LOCKED - Phase 5]
+
+You may now access Phase 3 content.
+
+[Note: This security system was designed by Dr. Helena Varga]
+[Note: "No single station should hold the keys to digital immortality"]

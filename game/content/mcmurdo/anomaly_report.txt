@@ -32,5 +32,3 @@ Chief Biologist, McMurdo Station
 [AUTOMATED SYSTEM ALERT TRIGGERED]
 [Cross-reference file: /Vostok_Station_RU/research/cryptobiology/]
 [Security classification: Requires multi-station authentication]
-
-[ANNOTATION 2237-08-15: This organism is now the dominant species]

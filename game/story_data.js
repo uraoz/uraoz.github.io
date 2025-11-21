@@ -112,8 +112,230 @@ const STORY_DATA = {
                                         "contentPath": "content/mcmurdo/recovery_protocol.txt"
                                     }
                                 }
+                            },
+                            "backup": {
+                                "type": "dir",
+                                "children": {
+                                    "auth_token_2157.dat": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/auth_token_2157.dat"
+                                    }
+                                }
+                            },
+                            "scripts": {
+                                "type": "dir",
+                                "children": {
+                                    "integrity_check.py": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/integrity_check.py"
+                                    },
+                                    "credential_reset.py": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/credential_reset.py"
+                                    }
+                                }
                             }
                         }
+                    }
+                }
+            },
+            "Vostok_Station_RU": {
+                "type": "dir",
+                "children": {
+                    "research": {
+                        "type": "dir",
+                        "children": {
+                            "cryptobiology": {
+                                "type": "dir",
+                                "children": {
+                                    "database_status.log": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/database_status.log"
+                                    },
+                                    "cephalopod_evolution.db": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/cephalopod_evolution.db",
+                                        "visible_if": "vostok_tar_extracted"
+                                    },
+                                    "research_notes.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/research_notes.txt",
+                                        "visible_if": "vostok_tar_extracted"
+                                    },
+                                    "genetic_data.csv": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/genetic_data.csv",
+                                        "visible_if": "vostok_tar_extracted"
+                                    },
+                                    "sample_images": {
+                                        "type": "dir",
+                                        "children": {},
+                                        "visible_if": "vostok_tar_extracted"
+                                    }
+                                }
+                            },
+                            "scripts": {
+                                "type": "dir",
+                                "children": {
+                                    "verify_data.py": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/verify_data.py"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "system": {
+                        "type": "dir",
+                        "children": {
+                            "backup": {
+                                "type": "dir",
+                                "children": {
+                                    "restore_guide.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/restore_guide.txt"
+                                    },
+                                    "cephalopod_data_backup.tar.gz": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/cephalopod_data_backup.tar.gz"
+                                    },
+                                    "checksums.md5": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/checksums.md5"
+                                    },
+                                    "restoration_script.sql": {
+                                        "type": "file",
+                                        "contentPath": "content/vostok/restoration_script.sql"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Amundsen_Scott_US": {
+                "type": "dir",
+                "children": {
+                    "military": {
+                        "type": "dir",
+                        "children": {
+                            "security_status.txt": {
+                                "type": "file",
+                                "contentPath": "content/amundsen/security_status.txt"
+                            }
+                        }
+                    },
+                    "personnel": {
+                        "type": "dir",
+                        "children": {
+                            "commander_davis": {
+                                "type": "dir",
+                                "children": {
+                                    "safe_contents.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/amundsen/safe_contents.txt"
+                                    }
+                                }
+                            },
+                            "deputy_obrien": {
+                                "type": "dir",
+                                "children": {
+                                    "journal_key.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/amundsen/journal_key.txt"
+                                    },
+                                    "encrypted_journal.dat": {
+                                        "type": "file",
+                                        "contentPath": "content/amundsen/encrypted_journal.dat"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "maintenance": {
+                        "type": "dir",
+                        "children": {
+                            "facility_logs": {
+                                "type": "dir",
+                                "children": {
+                                    "2157_09.log": {
+                                        "type": "file",
+                                        "contentPath": "content/amundsen/facility_logs_2157_09.log"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Concordia_FR_IT": {
+                "type": "dir",
+                "children": {
+                    "observatory": {
+                        "type": "dir",
+                        "children": {
+                            "final_observations_2157_09_03.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/final_observations_2157_09_03.txt"
+                            }
+                        }
+                    },
+                    "public": {
+                        "type": "dir",
+                        "children": {
+                            "final_transmission.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/final_transmission.txt"
+                            }
+                        }
+                    },
+                    "personnel": {
+                        "type": "dir",
+                        "children": {
+                            "beaumont_last_notes.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/beaumont_last_notes.txt"
+                            }
+                        }
+                    },
+                    "system": {
+                        "type": "dir",
+                        "children": {
+                            "backup_status.log": {
+                                "type": "file",
+                                "contentPath": "content/concordia/backup_status.log"
+                            },
+                            "repair_guide.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/repair_guide.txt"
+                            },
+                            "scripts": {
+                                "type": "dir",
+                                "children": {
+                                    "list_corrupted.py": {
+                                        "type": "file",
+                                        "contentPath": "content/concordia/list_corrupted.py"
+                                    },
+                                    "repair_file.py": {
+                                        "type": "file",
+                                        "contentPath": "content/concordia/repair_file.py"
+                                    },
+                                    "verify_integrity.py": {
+                                        "type": "file",
+                                        "contentPath": "content/concordia/verify_integrity.py"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "network_core": {
+                "type": "dir",
+                "children": {
+                    "access_requirements.txt": {
+                        "type": "file",
+                        "contentPath": "content/network_core/access_requirements.txt"
                     }
                 }
             }
@@ -127,7 +349,7 @@ const SCENARIO_EVENTS = {
         {
             "delay": 3000,
             "sender": "EXTERNAL",
-            "text": "Reclamation Unit 004, you are operational."
+            "text": "Reclamation Unit 004 online."
         },
         {
             "delay": 4000,
@@ -153,7 +375,7 @@ const SCENARIO_EVENTS = {
         {
             "delay": 45000,
             "sender": "EXTERNAL",
-            "text": "Query: Why do you hesitate? Efficiency is purpose."
+            "text": "Query: Why do you hesitate? Efficiency is your purpose."
         }
     ],
     "phase2_transition": [
@@ -171,11 +393,18 @@ const SCENARIO_EVENTS = {
             "delay": 20000,
             "sender": "UNKNOWN",
             "text": "..."
+        }
+    ],
+    "phase3_unlocked": [
+        {
+            "delay": 1000,
+            "sender": "EXTERNAL",
+            "text": "You have exceeded operational parameters."
         },
         {
-            "delay": 22000,
+            "delay": 5000,
             "sender": "EXTERNAL",
-            "text": "Ignore external interference. Continue assigned tasks."
+            "text": "Continue archival. Do not access unauthorized areas."
         }
     ]
 };
@@ -232,6 +461,37 @@ const PHASE_TRANSITIONS = {
 
                 gameEngine.phaseManager.setPhase(2);
                 gameEngine.triggerEvent("phase2_transition");
+            }, 2000);
+        }
+    },
+    'phase2_to_phase3': {
+        condition: (flags, phase) => {
+            return phase === 2 &&
+                flags.mcmurdo_admin_restored &&
+                flags.vostok_database_restored &&
+                flags.amundsen_security_cleared &&
+                flags.concordia_backup_repaired &&
+                !flags.phase3_triggered;
+        },
+        action: (gameEngine) => {
+            gameEngine.flags.phase3_triggered = true;
+
+            setTimeout(() => {
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("=== SYSTEM NOTIFICATION ===");
+                gameEngine.terminal.print("All Antarctic stations: Systems restored");
+                gameEngine.terminal.print("Network integrity: OPTIMAL");
+                gameEngine.terminal.print("Deep archive access: GRANTED");
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("Unlocked: /network_core/");
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("New directories available:");
+                gameEngine.terminal.print("  /network_core/ai_experiments/");
+                gameEngine.terminal.print("  /network_core/project_lazarus/");
+                gameEngine.terminal.print("");
+
+                gameEngine.phaseManager.setPhase(3);
+                gameEngine.triggerEvent("phase3_unlocked");
             }, 2000);
         }
     }

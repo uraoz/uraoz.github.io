@@ -1,0 +1,41 @@
+=== FINAL TRANSMISSION ===
+Concordia Station to All Antarctic Facilities
+Date: 2157-09-04
+Priority: EMERGENCY
+
+TO: All Antarctic Research Stations
+FROM: Concordia Station Command
+RE: Global Catastrophe - Survival Protocol
+
+SITUATION SUMMARY:
+As of 2157-09-03 14:23 UTC, global nuclear exchange has occurred.
+All major population centers appear destroyed.
+Northern hemisphere is uninhabitable.
+
+CONFIRMED STATIONS STILL RESPONDING:
+- McMurdo Station (US): ONLINE
+- Vostok Station (RU): ONLINE
+- Amundsen-Scott Station (US): ONLINE
+- Concordia Station (FR/IT): ONLINE
+
+IMMEDIATE ACTIONS:
+1. Seal all facilities against radiation
+2. Activate long-term life support systems
+3. Preserve all research data
+4. Maintain communication protocols
+
+LONG-TERM SURVIVAL:
+We estimate 6-18 months before radiation reaches lethal levels
+even at Antarctic latitudes. All personnel should prepare for
+extended isolation.
+
+FINAL DIRECTIVE:
+If you are reading this in the future, know that we tried.
+We documented everything. We preserved what we could.
+The data is here. Use it wisely.
+
+Dr. Jean-Pierre Laurent
+Station Commander
+Concordia Station
+
+[TRANSMISSION ENDS]

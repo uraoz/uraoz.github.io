@@ -1,0 +1,15 @@
+=== CEPHALOPOD EVOLUTION DATABASE ===
+SQLite format 3
+Database: cephalopod_evolution.db
+Version: 3.36.0
+
+This is a binary database file.
+Use 'sqlite3' command to query the database.
+
+Tables:
+- neural_mapping (14,523 records)
+- behavioral_data (8,991 records)
+- genetic_sequences (3,456 records)
+
+Last backup: 2157-09-01 12:00 UTC
+Status: RESTORED from backup

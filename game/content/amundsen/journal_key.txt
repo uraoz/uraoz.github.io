@@ -1,0 +1,18 @@
+=== DECRYPTION KEY ===
+For file: encrypted_journal.dat
+
+Deputy Commander Karen O'Brien maintained an encrypted
+personal journal as per privacy regulations.
+
+Key generation date: 2157-08-28
+Encryption method: AES-256-CBC
+
+DECRYPTION COMMAND:
+openssl enc -d -aes-256-cbc -in encrypted_journal.dat -out journal.txt -pass pass:REMEMBER_ALASKA_2142
+
+Passphrase context:
+"REMEMBER_ALASKA_2142" refers to Deputy O'Brien's
+first posting in Alaska before Antarctic assignment.
+
+[This key was stored separately per security protocol]
+[Required for emergency access to command-level information]

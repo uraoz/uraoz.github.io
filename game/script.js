@@ -10,7 +10,7 @@ class PhaseManager {
                 name: "Phase 1: Awakening"
             },
             2: {
-                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode'],
+                allowedCommands: ['ls', 'cd', 'cat', 'pwd', 'status', 'help', 'clear', 'messages', 'log', 'ping', 'ssh', 'find', 'grep', 'decode', 'connect', 'tar', 'md5sum', 'openssl', 'python3', 'sqlite3', 'sudo'],
                 name: "Phase 2: Network Discovery"
             },
             3: {
@@ -363,7 +363,13 @@ class DirectoryFormatter {
         const entries = Object.keys(this.directory);
         if (entries.length === 0) return "(empty)";
 
-        return entries.map(name => {
+        return entries.filter(name => {
+            const child = this.directory[name];
+            if (child.visible_if) {
+                return window.gameEngine.flags[child.visible_if];
+            }
+            return true;
+        }).map(name => {
             const child = this.directory[name];
             const type = child.type === 'dir' ? '[DIR]' : '[FILE]';
             const status = child.encrypted ? '[LOCKED]' : '';
@@ -391,6 +397,12 @@ class GameEngine {
 
             // Phase transition
             phase2_triggered: false,
+
+            // Phase 2 gimmick flags
+            vostok_tar_extracted: false,
+            concordia_file1_repaired: false,
+            concordia_file2_repaired: false,
+            concordia_file3_repaired: false,
 
             // Global flags
             first_ls: false,
@@ -447,6 +459,13 @@ class GameEngine {
         this.commandRegistry.register('decrypt', (args) => this.handleDecrypt(args));
         this.commandRegistry.register('log', () => this.handleLog());
         this.commandRegistry.register('messages', () => this.handleMessages());
+        this.commandRegistry.register('connect', (args) => this.handleConnect(args));
+        this.commandRegistry.register('tar', (args) => this.handleTar(args));
+        this.commandRegistry.register('md5sum', (args) => this.handleMd5sum(args));
+        this.commandRegistry.register('openssl', (args) => this.handleOpenssl(args));
+        this.commandRegistry.register('python3', (args) => this.handlePython3(args));
+        this.commandRegistry.register('sqlite3', (args) => this.handleSqlite3(args));
+        this.commandRegistry.register('sudo', (args) => this.handleSudo(args));
     }
 
     execute(command, args) {
@@ -483,6 +502,28 @@ class GameEngine {
         this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
         this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
         this.terminal.print(`FILES READ: ${this.flags.files_read_count}`);
+        this.terminal.print(``);
+        this.terminal.print(`=== DEBUG: PHASE FLAGS ===`);
+
+        // Phase 1 flags
+        this.terminal.print(`Phase 1 Gimmicks:`);
+        this.terminal.print(`  read_kovacs_diary: ${this.flags.read_kovacs_diary || false}`);
+        this.terminal.print(`  read_automated_reports: ${this.flags.read_automated_reports || false}`);
+        this.terminal.print(`  read_staff_list: ${this.flags.read_staff_list || false}`);
+        this.terminal.print(`  read_anomaly_report: ${this.flags.read_anomaly_report || false}`);
+        this.terminal.print(`  read_station_list: ${this.flags.read_station_list || false}`);
+        this.terminal.print(`  read_sync_status: ${this.flags.read_sync_status || false}`);
+        this.terminal.print(`  phase2_triggered: ${this.flags.phase2_triggered || false}`);
+        this.terminal.print(``);
+
+        // Phase 2 flags
+        this.terminal.print(`Phase 2 Gimmicks:`);
+        this.terminal.print(`  vostok_tar_extracted: ${this.flags.vostok_tar_extracted || false}`);
+        this.terminal.print(`  mcmurdo_admin_restored: ${this.flags.mcmurdo_admin_restored || false}`);
+        this.terminal.print(`  vostok_database_restored: ${this.flags.vostok_database_restored || false}`);
+        this.terminal.print(`  amundsen_security_cleared: ${this.flags.amundsen_security_cleared || false}`);
+        this.terminal.print(`  concordia_backup_repaired: ${this.flags.concordia_backup_repaired || false}`);
+        this.terminal.print(`  phase3_triggered: ${this.flags.phase3_triggered || false}`);
     }
 
     handleWhoami() {
@@ -525,7 +566,12 @@ class GameEngine {
         for (let i = 1; i < pathArray.length; i++) {
             const part = pathArray[i];
             if (current.children && current.children[part]) {
-                current = current.children[part];
+                const nextNode = current.children[part];
+                // Check visibility
+                if (nextNode.visible_if && !this.flags[nextNode.visible_if]) {
+                    return null;
+                }
+                current = nextNode;
             } else {
                 return null;
             }
@@ -535,17 +581,26 @@ class GameEngine {
 
     resolveRelativePath(inputPath) {
         const parts = inputPath.split('/');
-        let tempPath = [...this.currentPath];
+        let tempPath = inputPath.startsWith('/') ? [] : [...this.currentPath];
 
         for (const part of parts) {
             if (part === '.' || part === '') continue;
             if (part === '..') {
-                if (tempPath.length > 1) { // Don't pop root
+                if (tempPath.length > 0) {
+                    // If we are at root (length 1 and it is 'root'), don't pop
+                    if (tempPath.length === 1 && tempPath[0] === 'root') {
+                        continue;
+                    }
                     tempPath.pop();
                 }
             } else {
                 tempPath.push(part);
             }
+        }
+
+        // Handle case where path resolves to empty (e.g. cd /) -> default to root
+        if (tempPath.length === 0) {
+            tempPath = ['root'];
         }
 
         const node = this.resolvePath(tempPath);
@@ -591,6 +646,22 @@ class GameEngine {
         const result = this.resolveRelativePath(target);
 
         if (result && result.node && result.node.type === 'dir') {
+            // Check if trying to change to a different station under /root
+            const currentStation = this.currentPath.length >= 2 ? this.currentPath[1] : null;
+            const targetStation = result.pathArray.length >= 2 ? result.pathArray[1] : null;
+
+            // List of station directories
+            const stations = ['McMurdo_Station_US', 'Vostok_Station_RU', 'Amundsen_Scott_US', 'Concordia_FR_IT'];
+
+            // If trying to change to a different station, deny
+            if (currentStation && targetStation &&
+                stations.includes(targetStation) &&
+                currentStation !== targetStation) {
+                this.terminal.print(`Error: Cannot access other stations via cd command.`, "error");
+                this.terminal.print(`Use 'connect [STATION_NAME]' or 'connect [IP_ADDRESS]' to switch stations.`, "error");
+                return;
+            }
+
             this.currentPath = result.pathArray;
             this.terminal.print(`Changed directory to /${this.currentPath.join('/')}`);
         } else {
@@ -610,6 +681,15 @@ class GameEngine {
         if (result && result.node) {
             const file = result.node;
             if (file.type === 'file') {
+                // Restrict cat to readable file types
+                const allowedExtensions = ['.txt', '.log', '.md', '.sql', '.md5', '.dat'];
+                const isAllowed = allowedExtensions.some(ext => target.toLowerCase().endsWith(ext));
+
+                if (!isAllowed) {
+                    this.terminal.print(`Error: Cannot display contents of '${target}'. File type not supported.`, "error");
+                    return;
+                }
+
                 if (file.encrypted) {
                     this.terminal.print("Error: File is encrypted. Use 'decrypt [file] [password]'.", "error");
                     this.triggerEvent("decrypt_fail");
@@ -683,6 +763,288 @@ class GameEngine {
         const transition = PHASE_TRANSITIONS[transitionName];
         if (transition && transition.condition(this.flags, this.phaseManager.currentPhase)) {
             transition.action(this);
+        }
+    }
+
+    handleConnect(args) {
+        if (args.length === 0) {
+            this.terminal.print("Usage: connect [IP_ADDRESS] or [STATION_NAME]");
+            return;
+        }
+
+        const target = args[0].toLowerCase();
+        const stations = {
+            'vostok': { ip: '134.55.23.101', path: 'Vostok_Station_RU' },
+            '134.55.23.101': { ip: '134.55.23.101', path: 'Vostok_Station_RU' },
+            'amundsen': { ip: '172.42.88.200', path: 'Amundsen_Scott_US' },
+            'amundsen-scott': { ip: '172.42.88.200', path: 'Amundsen_Scott_US' },
+            '172.42.88.200': { ip: '172.42.88.200', path: 'Amundsen_Scott_US' },
+            'concordia': { ip: '158.90.11.45', path: 'Concordia_FR_IT' },
+            '158.90.11.45': { ip: '158.90.11.45', path: 'Concordia_FR_IT' },
+            'mcmurdo': { ip: '192.168.1.1', path: 'McMurdo_Station_US' },
+            '192.168.1.1': { ip: '192.168.1.1', path: 'McMurdo_Station_US' }
+        };
+
+        const station = stations[target];
+        if (station) {
+            this.terminal.print(`Connecting to ${station.ip}...`);
+            setTimeout(() => {
+                this.terminal.print("Connection established.");
+                this.currentPath = ['root', station.path];
+                this.terminal.print(`Remote access granted: /root/${station.path}`);
+            }, 1000);
+        } else {
+            this.terminal.print(`Error: Host '${target}' unreachable.`, "error");
+        }
+    }
+
+    handleTar(args) {
+        // tar -xzf [file]
+        if (args.length < 2 || args[0] !== '-xzf') {
+            this.terminal.print("Usage: tar -xzf [archive_file]");
+            return;
+        }
+
+        const filename = args[1];
+        if (filename.includes('cephalopod_data_backup.tar.gz')) {
+            // Check if already extracted
+            if (this.flags.vostok_tar_extracted) {
+                this.terminal.print("Archive has already been extracted.", "error");
+                return;
+            }
+
+            this.terminal.print("Extracting archive...");
+            this.terminal.print("x cephalopod_evolution.db");
+            this.terminal.print("x research_notes.txt");
+            this.terminal.print("x sample_images/");
+            this.terminal.print("x genetic_data.csv");
+            this.terminal.print("Archive extracted successfully.");
+
+            // Set the flag
+            this.flags.vostok_tar_extracted = true;
+        } else {
+            this.terminal.print(`Error: Archive '${filename}' not found or invalid format.`, "error");
+        }
+    }
+
+    handleMd5sum(args) {
+        // md5sum -c [file]
+        if (args.length < 2 || args[0] !== '-c') {
+            this.terminal.print("Usage: md5sum -c [checksum_file]");
+            return;
+        }
+
+        const filename = args[1];
+        if (filename.includes('checksums.md5')) {
+            this.terminal.print("cephalopod_evolution.db: OK");
+            this.terminal.print("research_notes.txt: OK");
+            this.terminal.print("genetic_data.csv: OK");
+            this.terminal.print("All checksums verified.");
+        } else {
+            this.terminal.print(`Error: File '${filename}' not found.`, "error");
+        }
+    }
+
+    handleOpenssl(args) {
+        // openssl enc -d -aes-256-cbc -in [in] -out [out] -pass pass:[pass]
+        // Simplified check for game purposes
+        const cmdStr = args.join(' ');
+        if (cmdStr.includes('enc -d') &&
+            cmdStr.includes('encrypted_journal.dat') &&
+            cmdStr.includes('pass:REMEMBER_ALASKA_2142')) {
+
+            this.terminal.print("Decrypting...");
+            setTimeout(() => {
+                this.terminal.print("Done.");
+                // Create the decrypted file in memory/filesystem
+                // For now, we just let the user 'cat' the output file if we were fully simulating,
+                // but since we don't have full write capability in this simple engine, 
+                // we can just print the content or say it's available.
+                // Actually, let's just print the content directly as if they 'cat'ed it immediately
+                // or better, create a temporary file node if possible.
+                // For simplicity, we'll just say it's done and let them read the 'journal.txt' 
+                // which we will dynamically add or just print here?
+                // The design doc says "> cat journal.txt" afterwards.
+                // So we should probably add 'journal.txt' to the current directory in memory.
+
+                const currentDir = this.getCurrentDir();
+                if (currentDir) {
+                    currentDir['journal.txt'] = {
+                        type: 'file',
+                        content: `=== DEPUTY COMMANDER O'BRIEN - PERSONAL JOURNAL ===
+
+2157-08-20
+Another quiet day at the bottom of the world. Davis is
+worried about the increasing tensions up north. I told him
+we're probably the safest people on Earth down here.
+
+2157-09-01
+Davis received classified briefing from Strategic Command.
+He won't tell me details, but he looked shaken. Something
+about "contingency preparations."
+
+2157-09-03
+The world ended today.
+
+We watched it happen. Concordia's observatory saw the flashes.
+Thousands of them. The entire northern hemisphere.
+
+Davis gave me my emergency authorization code: SIERRA-9921
+He said if anything happens to him, someone needs to be able
+to access the facility.
+
+I asked him what we're supposed to do with nuclear missiles
+when there's nothing left to defend.
+
+He didn't answer.
+
+[FINAL ENTRY]`
+                    };
+                }
+            }, 1000);
+        } else {
+            this.terminal.print("Error: Decryption failed. Check command parameters and passphrase.", "error");
+        }
+    }
+
+    handlePython3(args) {
+        if (args.length === 0) {
+            this.terminal.print("Python 3.12.1 (main, Oct 2 2156, 10:00:00) [GCC 14.2.0] on linux");
+            this.terminal.print("Type \"help\", \"copyright\", \"credits\" or \"license\" for more information.");
+            this.terminal.print(">>> quit()");
+            return;
+        }
+
+        const scriptPath = args[0];
+        const scriptArgs = args.slice(1);
+
+        // McMurdo Scripts
+        if (scriptPath.includes('integrity_check.py')) {
+            this.terminal.print("=== SYSTEM INTEGRITY CHECK ===");
+            this.terminal.print("Scanning core systems...");
+            this.terminal.print("Checking file system integrity... OK");
+            this.terminal.print("Checking database consistency... OK");
+            this.terminal.print("System integrity: NOMINAL");
+            this.terminal.print("Recommendation: Proceed with credential reset.");
+        }
+        else if (scriptPath.includes('credential_reset.py')) {
+            if (scriptArgs.includes('--token') && scriptArgs.includes('LAZARUS-EMERGENCY-7A9F3E2B')) {
+                this.terminal.print("=== CREDENTIAL RESET UTILITY ===");
+                this.terminal.print("Validating token... OK");
+                this.terminal.print("Generating new admin credentials...");
+                this.terminal.print("Credentials installed successfully.");
+                this.terminal.print("SYSTEM NOTIFICATION: McMurdo Station admin access restored.");
+                this.flags.mcmurdo_admin_restored = true;
+                this.checkPhaseTransition('phase2_to_phase3');
+            } else {
+                this.terminal.print("Error: Invalid or missing token.");
+            }
+        }
+        // Vostok Scripts
+        else if (scriptPath.includes('verify_data.py')) {
+            this.terminal.print("=== DATA VERIFICATION ===");
+            this.terminal.print("Checking table integrity... OK");
+            this.terminal.print("Database verification: COMPLETE");
+            this.terminal.print("SYSTEM NOTIFICATION: Vostok Station database restored.");
+            this.flags.vostok_database_restored = true;
+            this.checkPhaseTransition('phase2_to_phase3');
+        }
+        // Concordia Scripts
+        else if (scriptPath.includes('list_corrupted.py')) {
+            this.terminal.print("=== SCANNING FOR CORRUPTED FILES ===");
+            this.terminal.print("CORRUPTED FILES FOUND: 3");
+            this.terminal.print("1. /observatory/final_observations_2157_09_03.txt");
+            this.terminal.print("2. /public/final_transmission.txt");
+            this.terminal.print("3. /personnel/beaumont_last_notes.txt");
+        }
+        else if (scriptPath.includes('repair_file.py')) {
+            const filename = scriptArgs[0];
+            if (filename) {
+                this.terminal.print(`=== FILE REPAIR UTILITY ===`);
+                this.terminal.print(`Target: ${filename}`);
+                this.terminal.print("Analyzing file structure... DONE");
+                this.terminal.print("Checking redundancy blocks... FOUND");
+                this.terminal.print("Reconstructing missing data... DONE");
+                this.terminal.print("Verifying checksums... OK");
+                this.terminal.print("File repaired successfully.");
+
+                // Set repair flags based on filename
+                if (filename.includes('final_observations')) {
+                    this.flags.concordia_file1_repaired = true;
+                } else if (filename.includes('final_transmission')) {
+                    this.flags.concordia_file2_repaired = true;
+                } else if (filename.includes('beaumont_last_notes')) {
+                    this.flags.concordia_file3_repaired = true;
+                }
+            } else {
+                this.terminal.print("Usage: python3 repair_file.py [filename]");
+            }
+        }
+        else if (scriptPath.includes('verify_integrity.py')) {
+            // Check if all files are repaired
+            if (this.flags.concordia_file1_repaired &&
+                this.flags.concordia_file2_repaired &&
+                this.flags.concordia_file3_repaired) {
+                this.terminal.print("=== INTEGRITY VERIFICATION ===");
+                this.terminal.print("Verifying all system files...");
+                this.terminal.print("Checking file system... 2,847 files scanned");
+                this.terminal.print("Checking checksums... ALL VALID");
+                this.terminal.print("Checking readability... ALL READABLE");
+                this.terminal.print("System integrity: 100%");
+                this.terminal.print("SYSTEM NOTIFICATION: Concordia Station backup system fully restored.");
+                this.flags.concordia_backup_repaired = true;
+                this.checkPhaseTransition('phase2_to_phase3');
+            } else {
+                this.terminal.print("=== INTEGRITY VERIFICATION ===");
+                this.terminal.print("Verifying all system files...");
+                this.terminal.print("ERROR: Corrupted files still detected.", "error");
+                this.terminal.print("Please repair all corrupted files before running verification.", "error");
+                this.terminal.print("Run: python3 list_corrupted.py to see remaining files.");
+            }
+        }
+        else {
+            this.terminal.print(`Error: Script '${scriptPath}' not found or execution failed.`, "error");
+        }
+    }
+
+    handleSqlite3(args) {
+        // sqlite3 [db] < [script]
+        // In our simplified parser, '<' might be an arg or split.
+        // args might be: ['path/to/db', '<', 'path/to/sql']
+
+        if (args.includes('<') && args.includes('restoration_script.sql')) {
+            this.terminal.print("Restoring database schema...");
+            this.terminal.print("Importing neural_mapping table... 14,523 records");
+            this.terminal.print("Importing behavioral_data table... 8,991 records");
+            this.terminal.print("Importing genetic_sequences table... 3,456 records");
+            this.terminal.print("Database restored successfully.");
+        } else {
+            this.terminal.print("Usage: sqlite3 [database] < [script]");
+        }
+    }
+
+    handleSudo(args) {
+        // sudo authenticate --codes [c1] [c2] [c3]
+        if (args[0] === 'authenticate' && args[1] === '--codes') {
+            const codes = args.slice(2);
+            const required = ['OMEGA-7734', 'SIERRA-9921', 'TANGO-4456'];
+
+            // Check if all required codes are present (order doesn't strictly matter but let's check presence)
+            const allPresent = required.every(code => codes.includes(code));
+
+            if (allPresent) {
+                this.terminal.print("=== MILITARY FACILITY AUTHENTICATION ===");
+                this.terminal.print("Validating authorization codes...");
+                this.terminal.print("Triple authorization confirmed.");
+                this.terminal.print("Security clearance: GRANTED");
+                this.terminal.print("SYSTEM NOTIFICATION: Amundsen-Scott Station military access restored.");
+                this.flags.amundsen_security_cleared = true;
+                this.checkPhaseTransition('phase2_to_phase3');
+            } else {
+                this.terminal.print("Error: Invalid authorization codes. Access DENIED.", "error");
+            }
+        } else {
+            this.terminal.print("Usage: sudo authenticate --codes [code1] [code2] [code3]");
         }
     }
 }

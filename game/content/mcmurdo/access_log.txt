@@ -14,15 +14,12 @@ Reason: Security protocol for unattended systems
 Status: ADMIN PRIVILEGES LOCKED
 
 Recovery options:
-1. Re-authenticate with valid credentials [REQUIRES HUMAN]
+1. Re-authenticate with valid credentials [REQUIRES ADMINISTRATOR]
 2. Emergency recovery protocol [REQUIRES MANUAL INTERVENTION]
 
 For emergency recovery, see: /McMurdo_Station_US/system/admin/recovery_protocol.txt
 
 2237-08-15 00:00 UTC
-ERROR: 29,200 days since last admin login
+ERROR: 29,165 days since last admin login
 Admin privileges: STILL LOCKED
 Emergency override: AVAILABLE
-
-[SYSTEM NOTE: Unit 004, you will need admin access to reach]
-[SYSTEM NOTE: deeper levels of the network]

@@ -25,6 +25,3 @@ SUPPORT STAFF:
 Total Personnel: 12
 Emergency Contacts: [NORTHERN HEMISPHERE - ALL OFFLINE]
 Next Shift Change: 2157-11-01 [CANCELLED]
-
-[SYSTEM NOTE: "ARCHIVED" indicates biometric sensor offline]
-[SYSTEM NOTE: All personnel sensors went offline 2157-09-04 to 2157-09-05]

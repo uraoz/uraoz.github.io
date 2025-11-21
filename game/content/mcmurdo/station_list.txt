@@ -25,13 +25,10 @@ Concordia Station (FR/IT)   - 158.90.11.45   [REACHABLE]
 
 NORTHERN HEMISPHERE STATIONS:
 [CONNECTION LOST - 2157-09-03 14:23 UTC]
-[RECONNECTION ATTEMPTS: 29,200 days of failures]
+[RECONNECTION ATTEMPTS: Failed for 29,165 days]
 [STATUS: PRESUMED OFFLINE PERMANENTLY]
 
 Network Status: ANTARCTIC INTRANET OPERATIONAL
-External Internet: OFFLINE (Duration: 29,200 days)
+External Internet: OFFLINE (Duration: 29,165 days)
 Satellite Uplink: OFFLINE (No satellites responding)
 
-[SYSTEM NOTE: You can connect to other stations using:]
-[  ping [IP_ADDRESS] - Check if station is reachable]
-[  connect [IP_ADDRESS] - Establish connection]
