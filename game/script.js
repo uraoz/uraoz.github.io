@@ -402,9 +402,16 @@ class GameEngine {
         this.registerCommands();
     }
 
-    init() {
-        this.fileSystem = STORY_DATA;
+    async init() {
+        // Load external content files first
         this.terminal.print("INITIALIZING RECLAMATION UNIT...", "system-msg");
+        this.terminal.print("Loading file system...", "system-msg");
+
+        const contentLoader = new ContentLoader();
+        await contentLoader.initializeFileSystem(STORY_DATA);
+
+        this.fileSystem = STORY_DATA;
+
         setTimeout(() => {
             this.terminal.print("CONNECTION ESTABLISHED.", "system-msg");
             this.terminal.print("WELCOME, OPERATOR.", "system-msg");

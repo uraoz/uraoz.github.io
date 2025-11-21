@@ -1,0 +1,10 @@
+=== SUPPLY INVENTORY CHECK ===
+Date: 2157-09-01
+
+Food Rations: 45% (6 months remaining)
+Fuel Cells: 60% (1 year remaining)
+Water Reserves: 78% (indefinite - recycling active)
+Medical Supplies: 30% (3 months remaining)
+
+WARNING: Next supply drop is 2 weeks overdue.
+Status: Awaiting response from Christchurch logistics.

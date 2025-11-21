@@ -1,0 +1,37 @@
+=== ANTARCTIC RESEARCH NETWORK ===
+Station Directory
+Last Updated: 2157-08-30 12:00 UTC
+
+ACTIVE STATIONS:
+McMurdo Station (US)        - 192.168.1.1    [LOCAL]
+  Location: Ross Island
+  Personnel: 12
+  Status: ONLINE
+
+Vostok Station (RU)         - 134.55.23.101  [REACHABLE]
+  Location: East Antarctica
+  Personnel: 14
+  Status: ONLINE
+
+Amundsen-Scott Station (US) - 172.42.88.200  [REACHABLE]
+  Location: South Pole
+  Personnel: 18
+  Status: ONLINE
+
+Concordia Station (FR/IT)   - 158.90.11.45   [REACHABLE]
+  Location: Dome C
+  Personnel: 16
+  Status: ONLINE
+
+NORTHERN HEMISPHERE STATIONS:
+[CONNECTION LOST - 2157-09-03 14:23 UTC]
+[RECONNECTION ATTEMPTS: 29,200 days of failures]
+[STATUS: PRESUMED OFFLINE PERMANENTLY]
+
+Network Status: ANTARCTIC INTRANET OPERATIONAL
+External Internet: OFFLINE (Duration: 29,200 days)
+Satellite Uplink: OFFLINE (No satellites responding)
+
+[SYSTEM NOTE: You can connect to other stations using:]
+[  ping [IP_ADDRESS] - Check if station is reachable]
+[  connect [IP_ADDRESS] - Establish connection]

@@ -1,0 +1,30 @@
+=== MCMURDO STATION PERSONNEL ROSTER ===
+Winter Season 2157
+Last Updated: 2157-09-03 13:00 UTC
+
+COMMAND STAFF:
+- Commander: James Miller (Age: 42) (Status: ARCHIVED)
+- Deputy Commander: Lt. Karen O'Brien (Age: 38) (Status: ARCHIVED)
+
+RESEARCH TEAM:
+- Chief Scientist: Dr. Anna Kovacs (Age: 35, Cryptobiology) (Status: ARCHIVED)
+- Medical Officer: Dr. Sarah Chen (Age: 40) (Status: ARCHIVED)
+- Geologist: Dr. Patricia Yamamoto (Age: 44) (Status: ARCHIVED)
+- Physicist: Dr. Ricardo Torres (Age: 37) (Status: ARCHIVED)
+
+ENGINEERING:
+- Chief Engineer: Marco Rossi (Age: 45) (Status: ARCHIVED)
+- Systems Technician: Lisa Kim (Age: 29) (Status: ARCHIVED)
+
+SUPPORT STAFF:
+- Cook: Jack Anderson (Age: 52) (Status: ARCHIVED)
+- Mechanic: Thomas Walsh (Age: 34) (Status: ARCHIVED)
+- Maintenance: Elena Volkov (Age: 31) (Status: ARCHIVED)
+- Communications: David Park (Age: 27) (Status: ARCHIVED)
+
+Total Personnel: 12
+Emergency Contacts: [NORTHERN HEMISPHERE - ALL OFFLINE]
+Next Shift Change: 2157-11-01 [CANCELLED]
+
+[SYSTEM NOTE: "ARCHIVED" indicates biometric sensor offline]
+[SYSTEM NOTE: All personnel sensors went offline 2157-09-04 to 2157-09-05]
