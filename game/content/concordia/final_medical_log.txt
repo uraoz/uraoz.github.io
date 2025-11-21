@@ -1,0 +1,48 @@
+=== MEDICAL LOG ===
+Dr. Sarah Chen (on loan from McMurdo)
+Concordia Station Medical Officer
+2157-09-05 to 2157-10-18
+
+[SUMMARY OF RADIATION EXPOSURE TREATMENT]
+
+2157-09-05: First symptoms appearing
+- Patient count: 16 (entire crew)
+- Symptoms: Nausea, fatigue, headache
+- Estimated exposure: 3-5 Sv
+- Prognosis: Poor for all patients
+
+2157-09-10: Acute Radiation Syndrome progression
+- Deceased: 3 patients
+- Remaining: 13 patients
+- New symptoms: Hair loss, internal bleeding
+- Morphine supply: 60% remaining
+
+2157-09-20: Critical stage
+- Deceased: 11 total
+- Remaining: 5 patients
+- Medical interventions: Ineffective
+- Pain management: Only option remaining
+
+2157-10-14: Dr. Beaumont is the last ambulatory patient
+- All others in medical bay, unresponsive
+- Dr. Beaumont insisted on data upload before collapse
+- I respect her dedication
+
+2157-10-18: My final entry
+- All other patients deceased
+- I'm experiencing Stage 4 ARS symptoms
+- Vision blurring . . . . hands shaking . . .
+- Morphine . . . self-administered . . .
+
+To whoever finds this:
+We died doing science.
+We died hoping for a future we won't see.
+
+Tell them we tried.
+
+Dr. Sarah Chen
+[FINAL ENTRY - TIMESTAMP: 2157-10-18 03:42 UTC]
+
+Personnel ID: Dr. Sarah Chen (McMurdo Station)
+Transfer date: 2157-09-04
+Return status: Did not return

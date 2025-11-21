@@ -1,0 +1,25 @@
+=== PHOTO ARCHIVE METADATA ===
+McMurdo Station Personnel Photo Collection
+Last Updated: 2157-09-03
+
+IMG_2157-08-20_001.jpg
+- Subject: Dr. Kovacs and Dr. Chen playing chess
+- Location: Common room
+- Timestamp: 2157-08-20 19:42 UTC
+- Caption: "Anna wins again. I'm starting to think she's psychic." - Chen
+
+IMG_2157-08-28_042.jpg
+- Subject: Commander Miller at sunset
+- Location: Observation deck
+- Timestamp: 2157-08-28 22:15 UTC
+- Caption: "Last sunset before polar night. Beautiful and terrifying."
+
+IMG_2157-09-03_091.jpg
+- Subject: [CORRUPTED]
+- Location: [CORRUPTED]
+- Timestamp: 2157-09-03 14:30 UTC
+- Caption: "The sky. Why is the sky red."
+
+Total archived: 847 photos
+Last photo: 2157-09-03 14:30 UTC
+Subjects status: ARCHIVED

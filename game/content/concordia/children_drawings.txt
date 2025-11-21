@@ -1,0 +1,30 @@
+=== CHILDREN'S ART ARCHIVE ===
+Concordia Station Educational Program
+2156-2157 Winter Season
+
+Digital scans of artwork created by station children
+
+Drawing_001.jpg
+- Artist: Emma Laurent (age 6)
+- Title: "My Dad Works With Stars"
+- Date: 2157-07-12
+- Description: Crayon drawing of telescope and stars
+- Note: Dr. Laurent's daughter
+
+Drawing_008.jpg
+- Artist: Isabella Rossi (age 8)
+- Title: "Penguin Family"
+- Date: 2157-08-23
+- Description: Watercolor of emperor penguins
+- Teacher's note: "Isabella has a wonderful eye for nature"
+
+Drawing_015.jpg
+- Artist: Emma Laurent (age 6)
+- Title: "The Red Sky"
+- Date: 2157-09-04
+- Description: [FILE CORRUPTED]
+- Teacher's note: [NO NOTE]
+
+Children present: 15 (ages 4-12)
+Biometric sensors: All offline by 2157-10-20
+Artwork status: Digital scans preserved

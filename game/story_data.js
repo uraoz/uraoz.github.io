@@ -63,6 +63,24 @@ const STORY_DATA = {
                                         "contentPath": "content/mcmurdo/2157_09_03.log"
                                     }
                                 }
+                            },
+                            "photos": {
+                                "type": "dir",
+                                "children": {
+                                    "metadata.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/photos_metadata.txt"
+                                    }
+                                }
+                            },
+                            "entertainment": {
+                                "type": "dir",
+                                "children": {
+                                    "music_playlist.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/music_playlist.txt"
+                                    }
+                                }
                             }
                         }
                     },
@@ -134,6 +152,19 @@ const STORY_DATA = {
                                         "contentPath": "content/mcmurdo/credential_reset.py"
                                     }
                                 }
+                            },
+                            "maintenance": {
+                                "type": "dir",
+                                "children": {
+                                    "coffee_maker.log": {
+                                        "type": "file",
+                                        "contentPath": "content/mcmurdo/coffee_maker.log"
+                                        }
+                                    }
+                                },
+                            "time_capsule.txt": {
+                                "type": "file",
+                                "contentPath": "content/mcmurdo/time_capsule.txt"
                             }
                         }
                     }
@@ -208,6 +239,32 @@ const STORY_DATA = {
                                         "contentPath": "content/vostok/restoration_script.sql"
                                     }
                                 }
+                            },
+                            "time_capsule.txt": {
+                                "type": "file",
+                                "contentPath": "content/vostok/time_capsule.txt"
+                            }
+                        }
+                    },
+                    "personnel": {
+                        "type": "dir",
+                        "children": {
+                            "station_complaints.txt": {
+                                "type": "file",
+                                "contentPath": "content/vostok/station_complaints.txt"
+                            },
+                            "movie_night_votes.txt": {
+                                "type": "file",
+                                "contentPath": "content/vostok/movie_night_votes.txt"
+                            }
+                        }
+                    },
+                    "maintenance": {
+                        "type": "dir",
+                        "children": {
+                            "heating_system_complaints.log": {
+                                "type": "file",
+                                "contentPath": "content/vostok/heating_system_complaints.log"
                             }
                         }
                     }
@@ -222,6 +279,14 @@ const STORY_DATA = {
                             "security_status.txt": {
                                 "type": "file",
                                 "contentPath": "content/amundsen/security_status.txt"
+                            },
+                            "project_icepick_manifest.txt": {
+                                "type": "file",
+                                "contentPath": "content/amundsen/project_icepick_manifest.txt"
+                            },
+                            "warhead_status.log": {
+                                "type": "file",
+                                "contentPath": "content/amundsen/warhead_status.log"
                             }
                         }
                     },
@@ -234,6 +299,10 @@ const STORY_DATA = {
                                     "safe_contents.txt": {
                                         "type": "file",
                                         "contentPath": "content/amundsen/safe_contents.txt"
+                                    },
+                                    "letter_to_family.txt": {
+                                        "type": "file",
+                                        "contentPath": "content/amundsen/letter_to_family.txt"
                                     }
                                 }
                             },
@@ -265,6 +334,15 @@ const STORY_DATA = {
                                 }
                             }
                         }
+                    },
+                    "system": {
+                       "type": "dir",
+                        "children": {
+                            "time_capsule.txt": {
+                                "type": "file",
+                                "contentPath": "content/amundsen/time_capsule.txt"
+                            }
+                        }
                     }
                 }
             },
@@ -277,6 +355,10 @@ const STORY_DATA = {
                             "final_observations_2157_09_03.txt": {
                                 "type": "file",
                                 "contentPath": "content/concordia/final_observations_2157_09_03.txt"
+                            },
+                            "last_clear_sky.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/last_clear_sky.txt"
                             }
                         }
                     },
@@ -295,6 +377,19 @@ const STORY_DATA = {
                             "beaumont_last_notes.txt": {
                                 "type": "file",
                                 "contentPath": "content/concordia/beaumont_last_notes.txt"
+                            },
+                            "children_drawings.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/children_drawings.txt"
+                            }
+                        }
+                    },
+                    "medical": {
+                        "type": "dir",
+                        "children": {
+                            "final_medical_log.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/final_medical_log.txt"
                             }
                         }
                     },
@@ -304,6 +399,10 @@ const STORY_DATA = {
                             "backup_status.log": {
                                 "type": "file",
                                 "contentPath": "content/concordia/backup_status.log"
+                            },
+                            "time_capsule.txt": {
+                                "type": "file",
+                                "contentPath": "content/concordia/time_capsule.txt"
                             },
                             "repair_guide.txt": {
                                 "type": "file",

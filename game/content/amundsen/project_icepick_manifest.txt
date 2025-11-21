@@ -1,0 +1,41 @@
+=== PROJECT ICEPICK - EQUIPMENT MANIFEST ===
+Classified: OMEGA
+Facility: Amundsen-Scott Underground Complex
+Last Updated: 2157-08-30
+
+BIOLOGICAL CONTAINMENT UNITS:
+- BSL-4 laboratory modules: 2 units
+- Cryogenic sample storage: 847 specimens
+- Pathogen isolation chambers: 12 active
+
+SAMPLE INVENTORY (Partial):
+- VX nerve agent derivatives: 23 variants
+- Chimeric influenza strains: 14 samples
+- Antibiotic-resistant bacteria: 156 cultures
+- Experimental bioweapons: [REDACTED]
+- "Enhanced" pathogens: [REDACTED]
+
+PERSONNEL CLEARANCE:
+- Dr. Helena Varga: Project Director
+- Commander Davis: Facility Security
+- Dr. Richard Huang: Lead Virologist
+- Access restricted to 6 individuals
+
+PROJECT STATUS (as of 2157-08-30):
+All samples sealed in cryogenic storage.
+Automated containment protocols: ACTIVE
+Estimated safe storage duration: 500+ years
+
+NOTE:
+Per Antarctic Treaty violations investigation (2156),
+all offensive research was officially "discontinued."
+
+Samples retained for "defensive research purposes only."
+
+Automated Integrity Check (2237-08-15):
+Containment: INTACT
+Temperature: -196°C (liquid nitrogen)
+Biological activity: SUSPENDED
+Leak detection: NEGATIVE
+
+Duration in storage: 29,165 days
