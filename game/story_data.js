@@ -179,3 +179,60 @@ const SCENARIO_EVENTS = {
         }
     ]
 };
+
+const FILE_TRIGGERS = {
+    'kovacs_diary.txt': {
+        flag: 'read_kovacs_diary',
+        events: []
+    },
+    'automated_reports.log': {
+        flag: 'read_automated_reports',
+        events: []
+    },
+    'staff_list.txt': {
+        flag: 'read_staff_list',
+        events: []
+    },
+    'anomaly_report.txt': {
+        flag: 'read_anomaly_report',
+        events: []
+    },
+    'station_list.txt': {
+        flag: 'read_station_list',
+        events: ['phase1_to_phase2']
+    },
+    'sync_status.log': {
+        flag: 'read_sync_status',
+        events: ['phase1_to_phase2']
+    }
+};
+
+const PHASE_TRANSITIONS = {
+    'phase1_to_phase2': {
+        condition: (flags, phase) => {
+            return phase === 1 &&
+                (flags.read_station_list || flags.read_sync_status) &&
+                !flags.phase2_triggered;
+        },
+        action: (gameEngine) => {
+            gameEngine.flags.phase2_triggered = true;
+
+            setTimeout(() => {
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("=== SYSTEM NOTIFICATION ===");
+                gameEngine.terminal.print("Network station data acquired.");
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("You can now connect to other Antarctic stations:");
+                gameEngine.terminal.print("  - Vostok Station (RU): 134.55.23.101");
+                gameEngine.terminal.print("  - Amundsen-Scott (US): 172.42.88.200");
+                gameEngine.terminal.print("  - Concordia (FR/IT): 158.90.11.45");
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("Use: connect [IP_ADDRESS] or connect [station_name]");
+                gameEngine.terminal.print("");
+
+                gameEngine.phaseManager.setPhase(2);
+                gameEngine.triggerEvent("phase2_transition");
+            }, 2000);
+        }
+    }
+};

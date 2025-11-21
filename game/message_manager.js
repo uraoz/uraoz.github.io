@@ -1,3 +1,51 @@
+const DECODE_CONFIG = {
+    MAX_ITERATIONS: 3,
+    INTERVAL_MS: 30,
+    DECODE_SPEED: 0.5,
+    SCRAMBLE_CHARS: '!@#$%^&*()_+-=[]{}|;:,.<>/?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+};
+
+class DecodeAnimator {
+    constructor(text, element, config) {
+        this.text = text;
+        this.element = element;
+        this.config = config;
+        this.iterations = 0;
+    }
+
+    start(callback) {
+        this.element.textContent = '';
+        this.interval = setInterval(() => this.animate(callback), this.config.INTERVAL_MS);
+    }
+
+    animate(callback) {
+        this.element.textContent = this.generateScrambledText();
+
+        if (this.iterations >= this.text.length) {
+            this.complete(callback);
+        }
+
+        this.iterations += this.config.DECODE_SPEED;
+    }
+
+    generateScrambledText() {
+        return this.text.split('')
+            .map((letter, index) => {
+                if (index < this.iterations) {
+                    return this.text[index];
+                }
+                return this.config.SCRAMBLE_CHARS[Math.floor(Math.random() * this.config.SCRAMBLE_CHARS.length)];
+            })
+            .join('');
+    }
+
+    complete(callback) {
+        clearInterval(this.interval);
+        this.element.textContent = this.text;
+        if (callback) callback();
+    }
+}
+
 class MessageManager {
     constructor() {
         this.container = document.getElementById('message-container');
@@ -47,31 +95,8 @@ class MessageManager {
     }
 
     decodeEffect(text, element, callback) {
-        const chars = '!@#$%^&*()_+-=[]{}|;:,.<>/?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let iterations = 0;
-        const maxIterations = 3; // How many times to scramble each character
-
-        // Clear content initially
-        element.textContent = '';
-
-        const interval = setInterval(() => {
-            element.textContent = text.split('')
-                .map((letter, index) => {
-                    if (index < iterations) {
-                        return text[index];
-                    }
-                    return chars[Math.floor(Math.random() * chars.length)];
-                })
-                .join('');
-
-            if (iterations >= text.length) {
-                clearInterval(interval);
-                element.textContent = text; // Ensure final text is correct
-                if (callback) callback();
-            }
-
-            iterations += 1 / 2; // Speed of decoding (smaller = slower)
-        }, 30);
+        const animator = new DecodeAnimator(text, element, DECODE_CONFIG);
+        animator.start(callback);
     }
 
     show() {

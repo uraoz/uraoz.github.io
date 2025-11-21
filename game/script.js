@@ -64,53 +64,70 @@ class Terminal {
         this.hiddenInput.addEventListener('keyup', () => this.updateInputDisplay());
         this.hiddenInput.addEventListener('click', () => this.updateInputDisplay());
 
-        this.hiddenInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const command = this.hiddenInput.value;
-                this.handleCommand(command);
-                this.hiddenInput.value = '';
-                this.updateInputDisplay();
-            } else if (e.key === 'Tab') {
-                e.preventDefault();
-                this.handleTabCompletion();
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (this.history.length > 0) {
-                    if (this.historyIndex === -1) {
-                        // First time pressing up, save current input
-                        this.currentInput = this.hiddenInput.value;
-                        this.historyIndex = this.history.length - 1;
-                    } else if (this.historyIndex > 0) {
-                        this.historyIndex--;
-                    }
-                    this.hiddenInput.value = this.history[this.historyIndex];
-                    this.updateInputDisplay();
-                    // Move cursor to end
-                    setTimeout(() => {
-                        this.hiddenInput.selectionStart = this.hiddenInput.value.length;
-                        this.hiddenInput.selectionEnd = this.hiddenInput.value.length;
-                    }, 0);
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (this.historyIndex !== -1) {
-                    if (this.historyIndex < this.history.length - 1) {
-                        this.historyIndex++;
-                        this.hiddenInput.value = this.history[this.historyIndex];
-                    } else {
-                        // Reached the end, restore current input
-                        this.historyIndex = -1;
-                        this.hiddenInput.value = this.currentInput || '';
-                    }
-                    this.updateInputDisplay();
-                    // Move cursor to end
-                    setTimeout(() => {
-                        this.hiddenInput.selectionStart = this.hiddenInput.value.length;
-                        this.hiddenInput.selectionEnd = this.hiddenInput.value.length;
-                    }, 0);
-                }
+        this.hiddenInput.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    handleKeyDown(e) {
+        if (e.key === 'Enter') {
+            this.handleEnterKey();
+        } else if (e.key === 'Tab') {
+            this.handleTabKey(e);
+        } else if (e.key === 'ArrowUp') {
+            this.handleArrowUp(e);
+        } else if (e.key === 'ArrowDown') {
+            this.handleArrowDown(e);
+        }
+    }
+
+    handleEnterKey() {
+        const command = this.hiddenInput.value;
+        this.handleCommand(command);
+        this.hiddenInput.value = '';
+        this.updateInputDisplay();
+    }
+
+    handleTabKey(e) {
+        e.preventDefault();
+        this.handleTabCompletion();
+    }
+
+    handleArrowUp(e) {
+        e.preventDefault();
+        if (this.history.length > 0) {
+            if (this.historyIndex === -1) {
+                // First time pressing up, save current input
+                this.currentInput = this.hiddenInput.value;
+                this.historyIndex = this.history.length - 1;
+            } else if (this.historyIndex > 0) {
+                this.historyIndex--;
             }
-        });
+            this.hiddenInput.value = this.history[this.historyIndex];
+            this.updateInputDisplay();
+            this.moveCursorToEnd();
+        }
+    }
+
+    handleArrowDown(e) {
+        e.preventDefault();
+        if (this.historyIndex !== -1) {
+            if (this.historyIndex < this.history.length - 1) {
+                this.historyIndex++;
+                this.hiddenInput.value = this.history[this.historyIndex];
+            } else {
+                // Reached the end, restore current input
+                this.historyIndex = -1;
+                this.hiddenInput.value = this.currentInput || '';
+            }
+            this.updateInputDisplay();
+            this.moveCursorToEnd();
+        }
+    }
+
+    moveCursorToEnd() {
+        setTimeout(() => {
+            this.hiddenInput.selectionStart = this.hiddenInput.value.length;
+            this.hiddenInput.selectionEnd = this.hiddenInput.value.length;
+        }, 0);
     }
 
     escapeHtml(text) {
@@ -145,78 +162,84 @@ class Terminal {
     }
 
     handleTabCompletion() {
-        const input = this.hiddenInput.value;
-        const cursorPos = this.hiddenInput.selectionStart;
+        const { textBeforeCursor, currentPart, isCommand, textAfterCursor } = this.getCompletionContext();
+        const candidates = this.getCandidates(currentPart, isCommand);
 
-        // Get the text up to the cursor
-        const textBeforeCursor = input.substring(0, cursorPos);
-        const textAfterCursor = input.substring(cursorPos);
+        if (candidates.length === 0) return;
 
-        // Split into parts
-        const parts = textBeforeCursor.split(/\s+/);
-        const currentPart = parts[parts.length - 1];
-        const isFirstWord = parts.length === 1 || (parts.length === 2 && textBeforeCursor.endsWith(' ') === false);
-
-        let candidates = [];
-
-        if (isFirstWord && !textBeforeCursor.includes(' ')) {
-            // Complete command
-            if (window.gameEngine) {
-                const allowedCommands = window.gameEngine.phaseManager.phaseConfig[window.gameEngine.phaseManager.currentPhase].allowedCommands;
-                candidates = allowedCommands.filter(cmd => cmd.startsWith(currentPart));
-            }
+        if (candidates.length === 1) {
+            this.applySingleCompletion(textBeforeCursor, currentPart, candidates[0], textAfterCursor);
         } else {
-            // Complete file/directory name
-            if (window.gameEngine) {
-                candidates = this.getFileCompletions(currentPart);
-            }
-        }
-
-        if (candidates.length === 0) {
-            // No matches, do nothing
-            return;
-        } else if (candidates.length === 1) {
-            // Single match, auto-complete
-            const beforeCurrentPart = textBeforeCursor.substring(0, textBeforeCursor.length - currentPart.length);
-            const newValue = beforeCurrentPart + candidates[0] + textAfterCursor;
-            this.hiddenInput.value = newValue;
-
-            // Set cursor position after the completed part
-            const newCursorPos = beforeCurrentPart.length + candidates[0].length;
-            setTimeout(() => {
-                this.hiddenInput.selectionStart = newCursorPos;
-                this.hiddenInput.selectionEnd = newCursorPos;
-                this.updateInputDisplay();
-            }, 0);
-        } else {
-            // Multiple matches, show them
-            this.print('');
-            this.print(candidates.join('  '));
-
-            // Find common prefix
-            const commonPrefix = this.findCommonPrefix(candidates);
-            if (commonPrefix.length > currentPart.length) {
-                // Complete to common prefix
-                const beforeCurrentPart = textBeforeCursor.substring(0, textBeforeCursor.length - currentPart.length);
-                const newValue = beforeCurrentPart + commonPrefix + textAfterCursor;
-                this.hiddenInput.value = newValue;
-
-                const newCursorPos = beforeCurrentPart.length + commonPrefix.length;
-                setTimeout(() => {
-                    this.hiddenInput.selectionStart = newCursorPos;
-                    this.hiddenInput.selectionEnd = newCursorPos;
-                    this.updateInputDisplay();
-                }, 0);
-            }
+            this.applyMultipleCompletion(textBeforeCursor, currentPart, candidates, textAfterCursor);
         }
 
         this.updateInputDisplay();
     }
 
+    getCompletionContext() {
+        const input = this.hiddenInput.value;
+        const cursorPos = this.hiddenInput.selectionStart;
+        const textBeforeCursor = input.substring(0, cursorPos);
+        const textAfterCursor = input.substring(cursorPos);
+        const parts = textBeforeCursor.split(/\s+/);
+        const currentPart = parts[parts.length - 1];
+
+        // Command completion if no spaces in text before cursor (meaning we are typing the first word)
+        const isCommand = !textBeforeCursor.trim().includes(' ') && !textBeforeCursor.endsWith(' ');
+
+        return { textBeforeCursor, currentPart, isCommand, textAfterCursor };
+    }
+
+    getCandidates(prefix, isCommand) {
+        if (!window.gameEngine) return [];
+
+        if (isCommand) {
+            const allowedCommands = window.gameEngine.phaseManager.phaseConfig[window.gameEngine.phaseManager.currentPhase].allowedCommands;
+            return allowedCommands.filter(cmd => cmd.startsWith(prefix));
+        } else {
+            return this.getFileCompletions(prefix);
+        }
+    }
+
+    applySingleCompletion(textBeforeCursor, currentPart, completion, textAfterCursor) {
+        const beforeCurrentPart = textBeforeCursor.substring(0, textBeforeCursor.length - currentPart.length);
+        const newValue = beforeCurrentPart + completion + textAfterCursor;
+        this.hiddenInput.value = newValue;
+
+        const newCursorPos = beforeCurrentPart.length + completion.length;
+        this.setCursorPosition(newCursorPos);
+    }
+
+    applyMultipleCompletion(textBeforeCursor, currentPart, candidates, textAfterCursor) {
+        this.print('');
+        this.print(candidates.join('  '));
+
+        const commonPrefix = this.findCommonPrefix(candidates);
+        if (commonPrefix.length > currentPart.length) {
+            this.applySingleCompletion(textBeforeCursor, currentPart, commonPrefix, textAfterCursor);
+        }
+    }
+
+    setCursorPosition(pos) {
+        setTimeout(() => {
+            this.hiddenInput.selectionStart = pos;
+            this.hiddenInput.selectionEnd = pos;
+            this.updateInputDisplay();
+        }, 0);
+    }
+
     getFileCompletions(prefix) {
         if (!window.gameEngine) return [];
 
-        // Split prefix into directory path and filename parts
+        const { dirPath, filePrefix } = this.parsePathPrefix(prefix);
+        const targetDir = this.resolveTargetDirectory(dirPath);
+
+        if (!targetDir) return [];
+
+        return this.buildCandidates(targetDir, filePrefix, dirPath);
+    }
+
+    parsePathPrefix(prefix) {
         const lastSlashIndex = prefix.lastIndexOf('/');
         let dirPath = '';
         let filePrefix = prefix;
@@ -225,30 +248,26 @@ class Terminal {
             dirPath = prefix.substring(0, lastSlashIndex);
             filePrefix = prefix.substring(lastSlashIndex + 1);
         }
+        return { dirPath, filePrefix };
+    }
 
-        // Get the target directory
-        let targetDir;
+    resolveTargetDirectory(dirPath) {
         if (dirPath) {
-            // Navigate to the subdirectory
             const result = window.gameEngine.resolveRelativePath(dirPath);
             if (!result || !result.node || result.node.type !== 'dir') {
-                return [];
+                return null;
             }
-            targetDir = result.node.children;
+            return result.node.children;
         } else {
-            // Use current directory
-            targetDir = window.gameEngine.getCurrentDir();
+            return window.gameEngine.getCurrentDir();
         }
+    }
 
-        if (!targetDir) return [];
-
+    buildCandidates(targetDir, filePrefix, dirPath) {
         const candidates = [];
         Object.keys(targetDir).forEach(name => {
             if (name.startsWith(filePrefix)) {
-                // Build full path for the candidate
                 const fullPath = dirPath ? dirPath + '/' + name : name;
-
-                // Add trailing slash for directories
                 if (targetDir[name].type === 'dir') {
                     candidates.push(fullPath + '/');
                 } else {
@@ -256,7 +275,6 @@ class Terminal {
                 }
             }
         });
-
         return candidates.sort();
     }
 
@@ -317,6 +335,43 @@ class Terminal {
     }
 }
 
+class CommandRegistry {
+    constructor() {
+        this.commands = new Map();
+    }
+
+    register(name, handler) {
+        this.commands.set(name, handler);
+    }
+
+    execute(name, args, context) {
+        const handler = this.commands.get(name);
+        if (!handler) {
+            throw new Error(`Command '${name}' not implemented`);
+        }
+        return handler(args, context);
+    }
+}
+
+class DirectoryFormatter {
+    constructor(directory, options) {
+        this.directory = directory;
+        this.options = options;
+    }
+
+    format() {
+        const entries = Object.keys(this.directory);
+        if (entries.length === 0) return "(empty)";
+
+        return entries.map(name => {
+            const child = this.directory[name];
+            const type = child.type === 'dir' ? '[DIR]' : '[FILE]';
+            const status = child.encrypted ? '[LOCKED]' : '';
+            return `${type.padEnd(8)} ${name} ${status}`;
+        }).join('\n');
+    }
+}
+
 class GameEngine {
     constructor(terminal) {
         this.terminal = terminal;
@@ -342,6 +397,9 @@ class GameEngine {
             first_cat: false,
             files_read_count: 0
         };
+
+        this.commandRegistry = new CommandRegistry();
+        this.registerCommands();
     }
 
     init() {
@@ -370,68 +428,69 @@ class GameEngine {
         }
     }
 
+    registerCommands() {
+        this.commandRegistry.register('help', (args) => this.handleHelp(args));
+        this.commandRegistry.register('clear', () => this.handleClear());
+        this.commandRegistry.register('ls', (args) => this.handleLs(args));
+        this.commandRegistry.register('cd', (args) => this.handleCd(args));
+        this.commandRegistry.register('cat', (args) => this.handleCat(args));
+        this.commandRegistry.register('pwd', () => this.handlePwd());
+        this.commandRegistry.register('status', () => this.handleStatus());
+        this.commandRegistry.register('whoami', () => this.handleWhoami());
+        this.commandRegistry.register('decrypt', (args) => this.handleDecrypt(args));
+        this.commandRegistry.register('log', () => this.handleLog());
+        this.commandRegistry.register('messages', () => this.handleMessages());
+    }
+
     execute(command, args) {
         if (!this.phaseManager.isCommandAllowed(command)) {
             this.terminal.print(`Command '${command}' not available in current system state.`, "error");
             return;
         }
 
-        switch (command) {
-            case 'help':
-                this.terminal.print("AVAILABLE COMMANDS:");
-                this.phaseManager.phaseConfig[this.phaseManager.currentPhase].allowedCommands.forEach(cmd => {
-                    this.terminal.print(`  ${cmd}`);
-                });
-                break;
-            case 'clear':
-                this.terminal.output.innerHTML = '';
-                break;
-            case 'ls':
-                this.handleLs(args);
-                // Trigger event on first ls
-                if (!this.flags.first_ls) {
-                    this.flags.first_ls = true;
-                    this.triggerEvent("phase1_first_ls");
-                }
-                break;
-            case 'cd':
-                this.handleCd(args);
-                break;
-            case 'cat':
-                this.handleCat(args);
-                // Trigger exploration event on first cat
-                if (!this.flags.first_cat) {
-                    this.flags.first_cat = true;
-                    this.triggerEvent("phase1_exploration");
-                }
-                break;
-            case 'pwd':
-                this.terminal.print(`/${this.currentPath.join('/')}`);
-                break;
-            case 'status':
-                this.terminal.print(`SYSTEM STATUS: ONLINE`);
-                this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
-                this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
-                this.terminal.print(`FILES READ: ${this.flags.files_read_count}`);
-                break;
-            case 'whoami':
-                this.terminal.print("RECLAMATION_UNIT_004");
-                this.terminal.print("Status: OPERATIONAL");
-                this.terminal.print("");
-                this.terminal.print("System Uptime: 0 days (relative to activation)");
-                break;
-            case 'decrypt':
-                this.handleDecrypt(args);
-                break;
-            case 'log':
-                this.messageManager.toggleHistory();
-                break;
-            case 'messages':
-                this.messageManager.printHistoryToCUI(this.terminal);
-                break;
-            default:
-                this.terminal.print(`Command '${command}' not implemented yet.`, "error");
+        try {
+            this.commandRegistry.execute(command, args, this);
+        } catch (e) {
+            this.terminal.print(`Command '${command}' not implemented yet.`, "error");
+            console.error(e);
         }
+    }
+
+    handleHelp() {
+        this.terminal.print("AVAILABLE COMMANDS:");
+        this.phaseManager.phaseConfig[this.phaseManager.currentPhase].allowedCommands.forEach(cmd => {
+            this.terminal.print(`  ${cmd}`);
+        });
+    }
+
+    handleClear() {
+        this.terminal.output.innerHTML = '';
+    }
+
+    handlePwd() {
+        this.terminal.print(`/${this.currentPath.join('/')}`);
+    }
+
+    handleStatus() {
+        this.terminal.print(`SYSTEM STATUS: ONLINE`);
+        this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
+        this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
+        this.terminal.print(`FILES READ: ${this.flags.files_read_count}`);
+    }
+
+    handleWhoami() {
+        this.terminal.print("RECLAMATION_UNIT_004");
+        this.terminal.print("Status: OPERATIONAL");
+        this.terminal.print("");
+        this.terminal.print("System Uptime: 0 days (relative to activation)");
+    }
+
+    handleLog() {
+        this.messageManager.toggleHistory();
+    }
+
+    handleMessages() {
+        this.messageManager.printHistoryToCUI(this.terminal);
     }
 
     // File System Helpers
@@ -487,36 +546,32 @@ class GameEngine {
     }
 
     handleLs(args) {
-        let targetNode = null;
+        const targetPath = args.length > 0 ? args[0] : this.currentPath;
+        const dir = this.resolveDirectory(targetPath);
 
-        if (args.length > 0) {
-            const result = this.resolveRelativePath(args[0]);
-            if (result && result.node) {
-                targetNode = result.node;
-            } else {
-                this.terminal.print(`Error: Directory '${args[0]}' not found.`, "error");
-                return;
-            }
+        if (!dir) {
+            this.terminal.print(`Error: Directory '${args[0]}' not found.`, "error");
+            return;
+        }
+
+        const formatter = new DirectoryFormatter(dir, {});
+        this.terminal.print(formatter.format());
+
+        // Trigger event on first ls
+        if (!this.flags.first_ls) {
+            this.flags.first_ls = true;
+            this.triggerEvent("phase1_first_ls");
+        }
+    }
+
+    resolveDirectory(targetPath) {
+        if (typeof targetPath === 'string') {
+            const result = this.resolveRelativePath(targetPath);
+            return result && result.node && result.node.type === 'dir' ? result.node.children : null;
         } else {
-            targetNode = this.resolvePath(this.currentPath);
+            const node = this.resolvePath(targetPath);
+            return node && node.type === 'dir' ? node.children : null;
         }
-
-        if (!targetNode || targetNode.type !== 'dir') {
-            this.terminal.print("Error: Target is not a directory.", "error");
-            return;
-        }
-
-        const children = targetNode.children;
-        if (Object.keys(children).length === 0) {
-            this.terminal.print("(empty)");
-            return;
-        }
-
-        Object.keys(children).forEach(name => {
-            const type = children[name].type === 'dir' ? '[DIR]' : '[FILE]';
-            const status = children[name].encrypted ? '[LOCKED]' : '';
-            this.terminal.print(`${type.padEnd(8)} ${name} ${status}`);
-        });
     }
 
     handleCd(args) {
@@ -556,6 +611,12 @@ class GameEngine {
                     // Check triggers with the filename only (simplified for now, might need full path later)
                     const filename = target.split('/').pop();
                     this.checkTriggers(filename);
+
+                    // Trigger exploration event on first cat
+                    if (!this.flags.first_cat) {
+                        this.flags.first_cat = true;
+                        this.triggerEvent("phase1_exploration");
+                    }
                 }
             } else {
                 this.terminal.print(`Error: '${target}' is a directory.`, "error");
@@ -600,37 +661,21 @@ class GameEngine {
         // Track file reads
         this.flags.files_read_count++;
 
-        // Update file-specific flags
-        if (filename === 'kovacs_diary.txt') this.flags.read_kovacs_diary = true;
-        if (filename === 'automated_reports.log') this.flags.read_automated_reports = true;
-        if (filename === 'staff_list.txt') this.flags.read_staff_list = true;
-        if (filename === 'anomaly_report.txt') this.flags.read_anomaly_report = true;
-        if (filename === 'station_list.txt') this.flags.read_station_list = true;
-        if (filename === 'sync_status.log') this.flags.read_sync_status = true;
+        const trigger = FILE_TRIGGERS[filename];
+        if (trigger) {
+            if (trigger.flag) {
+                this.flags[trigger.flag] = true;
+            }
+            if (trigger.events) {
+                trigger.events.forEach(event => this.checkPhaseTransition(event));
+            }
+        }
+    }
 
-        // Phase 1 -> Phase 2 trigger (station_list.txt OR sync_status.log)
-        if ((filename === 'station_list.txt' || filename === 'sync_status.log') &&
-            this.phaseManager.currentPhase === 1 &&
-            !this.flags.phase2_triggered) {
-
-            this.flags.phase2_triggered = true;
-
-            setTimeout(() => {
-                this.terminal.print("");
-                this.terminal.print("=== SYSTEM NOTIFICATION ===");
-                this.terminal.print("Network station data acquired.");
-                this.terminal.print("");
-                this.terminal.print("You can now connect to other Antarctic stations:");
-                this.terminal.print("  - Vostok Station (RU): 134.55.23.101");
-                this.terminal.print("  - Amundsen-Scott (US): 172.42.88.200");
-                this.terminal.print("  - Concordia (FR/IT): 158.90.11.45");
-                this.terminal.print("");
-                this.terminal.print("Use: connect [IP_ADDRESS] or connect [station_name]");
-                this.terminal.print("");
-
-                this.phaseManager.setPhase(2);
-                this.triggerEvent("phase2_transition");
-            }, 2000);
+    checkPhaseTransition(transitionName) {
+        const transition = PHASE_TRANSITIONS[transitionName];
+        if (transition && transition.condition(this.flags, this.phaseManager.currentPhase)) {
+            transition.action(this);
         }
     }
 }
