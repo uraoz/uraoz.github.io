@@ -19,7 +19,7 @@ Antarctic network: STABLE
 
 2157-09-03 14:20 UTC
 CRITICAL: Mass disconnection event detected
-- Northern hemisphere: Latency spike to 10,000ms+
+- Main station: Latency spike to 10,000ms+
 - Packet loss: 98-100%
 Attempting emergency protocols...
 
@@ -37,7 +37,7 @@ Isolated network mode activated automatically.
 Reconnection attempts: FAILED (attempt 1 of ∞)
 Reconnection attempts: FAILED (attempt 2 of ∞)
 Reconnection attempts: FAILED (attempt 3 of ∞)
-[... repeated 10,657,200 times ...]
+[... repeated 10,657,201 times ...]
 
 2157-09-04 00:00 UTC
 Status: ISOLATED NETWORK OPERATIONAL
@@ -49,5 +49,5 @@ Duration: 0 days, 9 hours, 37 minutes
 Status: ISOLATED NETWORK OPERATIONAL
 Antarctic intranet: 4 stations, all automated
 External connectivity: NONE
-Duration: 29,200 days
+Duration: 29,165 days
 

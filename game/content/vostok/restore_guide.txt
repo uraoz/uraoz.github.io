@@ -8,27 +8,12 @@ SOLUTION: Restore from last known good backup
 MANUAL RESTORATION PROCEDURE:
 
 Step 1: Extract backup archive
-        Command: tar -xzf /Vostok_Station_RU/system/backup/cephalopod_data_backup.tar.gz
-        Location: Extract to /Vostok_Station_RU/research/cryptobiology/
 
-Step 2: Verify backup integrity
-        Command: md5sum -c /Vostok_Station_RU/system/backup/checksums.md5
-        Purpose: Ensure backup files are not corrupted
+Step 2: Verify backup integrity (checksum)
 
 Step 3: Restore database
-        Command: sqlite3 /Vostok_Station_RU/research/cryptobiology/cephalopod_evolution.db < restoration_script.sql
-        This will overwrite corrupted database with backup data
 
 Step 4: Verify restoration
-        Command: python3 /Vostok_Station_RU/research/scripts/verify_data.py
-        This checks that all data is readable and consistent
 
 Expected result: Full access to Dr. Volkov's research archive
 
-BACKUP CONTENTS:
-- 40 generations of evolution data
-- Neural mapping from 2156-2157
-- Radiation exposure experiments
-- Theoretical projections (150-year evolution model)
-
-Time to complete: ~5 minutes

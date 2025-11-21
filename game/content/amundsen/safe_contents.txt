@@ -18,13 +18,8 @@ SAFE CONTENTS:
    Code: OMEGA-7734
    
 4. Personal letter to family (archived as davis_letter.txt)
-   Content: [PRIVATE - NOT RELEVANT TO FACILITY ACCESS]
+   Content: [PRIVATE]
 
 5. Rosary beads (Catholic)
    Sentimental value only
-
-EMERGENCY AUTHORIZATION CODE: OMEGA-7734
-
-[SYSTEM NOTE: Commander Davis was last seen 2157-09-05]
-[SYSTEM NOTE: Biometric records show death occurred approx. 2157-09-06]
-[SYSTEM NOTE: Presumed cause: Radiation exposure from fallout]
+   

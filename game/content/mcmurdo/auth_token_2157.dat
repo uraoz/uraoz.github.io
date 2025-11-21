@@ -5,8 +5,4 @@ Expires: NEVER
 
 TOKEN: LAZARUS-EMERGENCY-7A9F3E2B
 
-Usage: Provide this token to credential_reset.py
 Security Level: OMEGA
-
-[This token was created as failsafe for Project Lazarus]
-[In case all authorized administrators become unavailable]

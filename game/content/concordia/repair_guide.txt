@@ -10,19 +10,15 @@ written before power fluctuation.
 RECOVERY PROCEDURE:
 
 Step 1: Identify corrupted files
-        Command: python3 /Concordia_FR_IT/system/scripts/list_corrupted.py
-        This will scan all files and identify corruption
+        [FILE CORRUPTED - Check /sy█tem/█cri█ts/]
 
-Step 2: Repair each corrupted file individually
-        Command: python3 /Concordia_FR_IT/system/scripts/repair_file.py [filename]
-        The script uses checksums and redundancy to reconstruct data
+Step 2: Repair each corrupted file
+        [DATA CORRUPTION]
+        ...█epair█file.py...
 
-Step 3: Verify all repairs
-        Command: python3 /Concordia_FR_IT/system/scripts/verify_integrity.py
-        Final check to ensure all files are readable
+Step 3: Verify
+        [CORRUPTED]
+        ...█erify█[ERROR]
 
-ESTIMATED TIME: 10-15 minutes
-ESTIMATED CORRUPTED FILES: 3-5 files
+NOTE: Files from Sept 3-4, 2157
 
-NOTE: Most corrupted files are from September 3-4, 2157
-      These files document the final hours.

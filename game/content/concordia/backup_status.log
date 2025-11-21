@@ -4,7 +4,7 @@ Redundant Backup System v3.0
 
 Primary backup server: OFFLINE
 Failure date: 2189-07-23
-Cause: Hardware failure (cooling system malfunction)
+Cause: Hardware failure
 
 Redundant backup server: OPERATIONAL
 Status: PARTIAL DATA INTEGRITY
@@ -19,12 +19,11 @@ Estimated corrupted files: 3-5 research documents
 Current status (2237-08-15):
 - System functional: YES
 - Data accessible: MOSTLY
-- Corruption extent: MINOR but critical files affected
-- Automated repair: FAILED (requires manual intervention)
+- Corruption extent: MINOR
+- Automated repair: FAILED
 
 RECOMMENDATION:
 Manual verification and repair required.
-See: /Concordia_FR_IT/system/repair_guide.txt
 
 [SYSTEM NOTE: Corrupted files include final transmissions]
 [SYSTEM NOTE: and observational data from 2157-09-03]
