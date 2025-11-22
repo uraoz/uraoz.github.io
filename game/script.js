@@ -264,11 +264,11 @@ class Terminal {
     }
 
     buildCandidates(targetDir, filePrefix, dirPath, resolvedPath) {
-        const currentPath = window.gameEngine ? window.gameEngine.currentPath : null;
+        const currentStation = window.gameEngine ? window.gameEngine.currentStation : null;
         let names = Object.keys(targetDir).filter(name => name.startsWith(filePrefix));
 
         // Filter station directories based on access control
-        names = StationAccessControl.filterDirectories(names, resolvedPath, currentPath);
+        names = StationAccessControl.filterDirectories(names, resolvedPath, currentStation);
 
         const candidates = names.map(name => {
             const fullPath = dirPath ? dirPath + '/' + name : name;
@@ -365,21 +365,11 @@ class StationAccessControl {
         return pathArray && pathArray.length === 1 && pathArray[0] === 'root';
     }
 
-    static getCurrentStation(currentPath) {
-        return currentPath && currentPath.length >= 2 ? currentPath[1] : null;
-    }
-
-    static canNavigateTo(fromPath, toPath) {
-        // Prevent navigation to /root directly
-        if (this.isRootLevel(toPath)) {
-            return false;
-        }
-
-        const currentStation = this.getCurrentStation(fromPath);
-        const targetStation = this.getCurrentStation(toPath);
+    static canNavigateTo(fromPath, toPath, currentStation) {
+        const targetStation = toPath && toPath.length >= 2 ? toPath[1] : null;
 
         // Prevent cross-station navigation via cd
-        if (currentStation && targetStation &&
+        if (targetStation &&
             this.isStation(targetStation) &&
             currentStation !== targetStation) {
             return false;
@@ -388,8 +378,7 @@ class StationAccessControl {
         return true;
     }
 
-    static filterDirectories(names, resolvedPath, currentPath) {
-        const currentStation = this.getCurrentStation(currentPath);
+    static filterDirectories(names, resolvedPath, currentStation) {
         const isAtRoot = this.isRootLevel(resolvedPath);
 
         return names.filter(name => {
@@ -511,8 +500,8 @@ class DirectoryFormatter {
         });
 
         // Filter station directories using StationAccessControl
-        if (this.currentPath && this.targetPath) {
-            entries = StationAccessControl.filterDirectories(entries, this.targetPath, this.currentPath);
+        if (this.targetPath && window.gameEngine) {
+            entries = StationAccessControl.filterDirectories(entries, this.targetPath, window.gameEngine.currentStation);
         }
 
         // Format entries for display
@@ -532,6 +521,7 @@ class GameEngine {
         this.phaseManager = new PhaseManager(this);
         this.fileSystem = {}; // Will be loaded from story_data.js
         this.currentPath = ['root', 'McMurdo_Station_US'];
+        this.currentStation = 'McMurdo_Station_US'; // Internal variable for station access control
         // Phase 1 flags
         this.flags = {
             // File reading flags
@@ -746,13 +736,9 @@ class GameEngine {
 
         if (result && result.node && result.node.type === 'dir') {
             // Check access permissions using StationAccessControl
-            if (!StationAccessControl.canNavigateTo(this.currentPath, result.pathArray)) {
-                if (StationAccessControl.isRootLevel(result.pathArray)) {
-                    this.terminal.print(`Error: Cannot navigate to /root directly.`, "error");
-                } else {
-                    this.terminal.print(`Error: Cannot access other stations via cd command.`, "error");
-                    this.terminal.print(`Use 'connect [STATION_NAME]' or 'connect [IP_ADDRESS]' to switch stations.`, "error");
-                }
+            if (!StationAccessControl.canNavigateTo(this.currentPath, result.pathArray, this.currentStation)) {
+                this.terminal.print(`Error: Cannot access other stations via cd command.`, "error");
+                this.terminal.print(`Use 'connect [STATION_NAME]' or 'connect [IP_ADDRESS]' to switch stations.`, "error");
                 return;
             }
 
@@ -886,6 +872,7 @@ class GameEngine {
             setTimeout(() => {
                 this.terminal.print("Connection established.");
                 this.currentPath = ['root', station.path];
+                this.currentStation = station.path; // Update the current station
                 this.terminal.print(`Remote access granted: /root/${station.path}`);
             }, 1000);
         } else {
