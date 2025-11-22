@@ -232,11 +232,11 @@ class Terminal {
         if (!window.gameEngine) return [];
 
         const { dirPath, filePrefix } = this.parsePathPrefix(prefix);
-        const targetDir = this.resolveTargetDirectory(dirPath);
+        const result = this.resolveTargetDirectoryWithPath(dirPath);
 
-        if (!targetDir) return [];
+        if (!result || !result.dir) return [];
 
-        return this.buildCandidates(targetDir, filePrefix, dirPath);
+        return this.buildCandidates(result.dir, filePrefix, dirPath, result.resolvedPath);
     }
 
     parsePathPrefix(prefix) {
@@ -251,30 +251,30 @@ class Terminal {
         return { dirPath, filePrefix };
     }
 
-    resolveTargetDirectory(dirPath) {
+    resolveTargetDirectoryWithPath(dirPath) {
         if (dirPath) {
             const result = window.gameEngine.resolveRelativePath(dirPath);
             if (!result || !result.node || result.node.type !== 'dir') {
                 return null;
             }
-            return result.node.children;
+            return { dir: result.node.children, resolvedPath: result.pathArray };
         } else {
-            return window.gameEngine.getCurrentDir();
+            return { dir: window.gameEngine.getCurrentDir(), resolvedPath: window.gameEngine.currentPath };
         }
     }
 
-    buildCandidates(targetDir, filePrefix, dirPath) {
-        const candidates = [];
-        Object.keys(targetDir).forEach(name => {
-            if (name.startsWith(filePrefix)) {
-                const fullPath = dirPath ? dirPath + '/' + name : name;
-                if (targetDir[name].type === 'dir') {
-                    candidates.push(fullPath + '/');
-                } else {
-                    candidates.push(fullPath);
-                }
-            }
+    buildCandidates(targetDir, filePrefix, dirPath, resolvedPath) {
+        const currentPath = window.gameEngine ? window.gameEngine.currentPath : null;
+        let names = Object.keys(targetDir).filter(name => name.startsWith(filePrefix));
+
+        // Filter station directories based on access control
+        names = StationAccessControl.filterDirectories(names, resolvedPath, currentPath);
+
+        const candidates = names.map(name => {
+            const fullPath = dirPath ? dirPath + '/' + name : name;
+            return targetDir[name].type === 'dir' ? fullPath + '/' : fullPath;
         });
+
         return candidates.sort();
     }
 
@@ -353,23 +353,170 @@ class CommandRegistry {
     }
 }
 
+// Station Access Control - Manages station navigation restrictions
+class StationAccessControl {
+    static STATIONS = ['McMurdo_Station_US', 'Vostok_Station_RU', 'Amundsen_Scott_US', 'Concordia_FR_IT'];
+
+    static isStation(name) {
+        return this.STATIONS.includes(name);
+    }
+
+    static isRootLevel(pathArray) {
+        return pathArray && pathArray.length === 1 && pathArray[0] === 'root';
+    }
+
+    static getCurrentStation(currentPath) {
+        return currentPath && currentPath.length >= 2 ? currentPath[1] : null;
+    }
+
+    static canNavigateTo(fromPath, toPath) {
+        // Prevent navigation to /root directly
+        if (this.isRootLevel(toPath)) {
+            return false;
+        }
+
+        const currentStation = this.getCurrentStation(fromPath);
+        const targetStation = this.getCurrentStation(toPath);
+
+        // Prevent cross-station navigation via cd
+        if (currentStation && targetStation &&
+            this.isStation(targetStation) &&
+            currentStation !== targetStation) {
+            return false;
+        }
+
+        return true;
+    }
+
+    static filterDirectories(names, resolvedPath, currentPath) {
+        const currentStation = this.getCurrentStation(currentPath);
+        const isAtRoot = this.isRootLevel(resolvedPath);
+
+        return names.filter(name => {
+            // Skip other stations if we're at root level
+            if (isAtRoot && this.isStation(name) && name !== currentStation) {
+                return false;
+            }
+            return true;
+        });
+    }
+}
+
+// Path Resolver - Handles all path resolution logic
+class PathResolver {
+    constructor(fileSystem, flags) {
+        this.fileSystem = fileSystem;
+        this.flags = flags;
+    }
+
+    // Normalize a relative or absolute path to an array
+    normalize(inputPath, currentPath) {
+        const parts = inputPath.split('/');
+        let tempPath = inputPath.startsWith('/') ? [] : [...currentPath];
+
+        for (const part of parts) {
+            if (part === '.' || part === '') continue;
+            if (part === '..') {
+                if (tempPath.length > 0) {
+                    // If we are at root (length 1 and it is 'root'), don't pop
+                    if (tempPath.length === 1 && tempPath[0] === 'root') {
+                        continue;
+                    }
+                    tempPath.pop();
+                }
+            } else {
+                tempPath.push(part);
+            }
+        }
+
+        // Handle case where path resolves to empty (e.g. cd /) -> default to root
+        if (tempPath.length === 0) {
+            tempPath = ['root'];
+        }
+
+        return tempPath;
+    }
+
+    // Resolve a path array to a node
+    resolveNode(pathArray) {
+        let current = this.fileSystem;
+
+        // Special case for root
+        if (pathArray.length > 0 && pathArray[0] === 'root') {
+            current = current['root'];
+        } else {
+            return null;
+        }
+
+        for (let i = 1; i < pathArray.length; i++) {
+            const part = pathArray[i];
+            if (current.children && current.children[part]) {
+                const nextNode = current.children[part];
+                // Check visibility
+                if (nextNode.visible_if && !this.flags[nextNode.visible_if]) {
+                    return null;
+                }
+                current = nextNode;
+            } else {
+                return null;
+            }
+        }
+        return current;
+    }
+
+    // Resolve a string path to node and path array
+    resolve(inputPath, currentPath) {
+        const pathArray = this.normalize(inputPath, currentPath);
+        const node = this.resolveNode(pathArray);
+        return { node, pathArray };
+    }
+
+    // Get children of a directory
+    getChildren(pathOrArray, currentPath = null) {
+        let node;
+
+        if (typeof pathOrArray === 'string') {
+            const result = this.resolve(pathOrArray, currentPath);
+            node = result.node;
+        } else if (Array.isArray(pathOrArray)) {
+            node = this.resolveNode(pathOrArray);
+        } else {
+            return null;
+        }
+
+        return node && node.type === 'dir' ? node.children : null;
+    }
+}
+
+
 class DirectoryFormatter {
-    constructor(directory, options) {
+    constructor(directory, options, currentPath = null, targetPath = null) {
         this.directory = directory;
         this.options = options;
+        this.currentPath = currentPath;
+        this.targetPath = targetPath;
     }
 
     format() {
-        const entries = Object.keys(this.directory);
+        let entries = Object.keys(this.directory);
         if (entries.length === 0) return "(empty)";
 
-        return entries.filter(name => {
+        // Filter by visibility flags
+        entries = entries.filter(name => {
             const child = this.directory[name];
             if (child.visible_if) {
                 return window.gameEngine.flags[child.visible_if];
             }
             return true;
-        }).map(name => {
+        });
+
+        // Filter station directories using StationAccessControl
+        if (this.currentPath && this.targetPath) {
+            entries = StationAccessControl.filterDirectories(entries, this.targetPath, this.currentPath);
+        }
+
+        // Format entries for display
+        return entries.map(name => {
             const child = this.directory[name];
             const type = child.type === 'dir' ? '[DIR]' : '[FILE]';
             const status = child.encrypted ? '[LOCKED]' : '';
@@ -411,6 +558,7 @@ class GameEngine {
         };
 
         this.commandRegistry = new CommandRegistry();
+        this.pathResolver = null; // Will be initialized after fileSystem loads
         this.registerCommands();
     }
 
@@ -423,6 +571,7 @@ class GameEngine {
         await contentLoader.initializeFileSystem(STORY_DATA);
 
         this.fileSystem = STORY_DATA;
+        this.pathResolver = new PathResolver(this.fileSystem, this.flags);
 
         setTimeout(() => {
             this.terminal.print("CONNECTION ESTABLISHED.", "system-msg");
@@ -543,96 +692,46 @@ class GameEngine {
 
     // File System Helpers
     getCurrentDir() {
-        let current = this.fileSystem;
-        for (const part of this.currentPath) {
-            if (current[part] && current[part].children) {
-                current = current[part].children;
-            } else if (current[part]) {
-                return null;
-            }
-        }
-        return current;
+        return this.pathResolver.getChildren(this.currentPath);
     }
 
     resolvePath(pathArray) {
-        let current = this.fileSystem;
-        // Special case for root
-        if (pathArray.length > 0 && pathArray[0] === 'root') {
-            current = current['root'];
-        } else {
-            return null;
-        }
-
-        for (let i = 1; i < pathArray.length; i++) {
-            const part = pathArray[i];
-            if (current.children && current.children[part]) {
-                const nextNode = current.children[part];
-                // Check visibility
-                if (nextNode.visible_if && !this.flags[nextNode.visible_if]) {
-                    return null;
-                }
-                current = nextNode;
-            } else {
-                return null;
-            }
-        }
-        return current;
+        return this.pathResolver.resolveNode(pathArray);
     }
 
     resolveRelativePath(inputPath) {
-        const parts = inputPath.split('/');
-        let tempPath = inputPath.startsWith('/') ? [] : [...this.currentPath];
+        return this.pathResolver.resolve(inputPath, this.currentPath);
+    }
 
-        for (const part of parts) {
-            if (part === '.' || part === '') continue;
-            if (part === '..') {
-                if (tempPath.length > 0) {
-                    // If we are at root (length 1 and it is 'root'), don't pop
-                    if (tempPath.length === 1 && tempPath[0] === 'root') {
-                        continue;
-                    }
-                    tempPath.pop();
-                }
-            } else {
-                tempPath.push(part);
-            }
-        }
-
-        // Handle case where path resolves to empty (e.g. cd /) -> default to root
-        if (tempPath.length === 0) {
-            tempPath = ['root'];
-        }
-
-        const node = this.resolvePath(tempPath);
-        return { node, pathArray: tempPath };
+    resolveDirectory(targetPath) {
+        return this.pathResolver.getChildren(targetPath, this.currentPath);
     }
 
     handleLs(args) {
-        const targetPath = args.length > 0 ? args[0] : this.currentPath;
-        const dir = this.resolveDirectory(targetPath);
+        const targetPathInput = args.length > 0 ? args[0] : this.currentPath;
+        const dir = this.resolveDirectory(targetPathInput);
 
         if (!dir) {
             this.terminal.print(`Error: Directory '${args[0]}' not found.`, "error");
             return;
         }
 
-        const formatter = new DirectoryFormatter(dir, {});
+        // Resolve the target path to get the actual path array
+        let resolvedPath;
+        if (typeof targetPathInput === 'string') {
+            const result = this.resolveRelativePath(targetPathInput);
+            resolvedPath = result ? result.pathArray : this.currentPath;
+        } else {
+            resolvedPath = targetPathInput;
+        }
+
+        const formatter = new DirectoryFormatter(dir, {}, this.currentPath, resolvedPath);
         this.terminal.print(formatter.format());
 
         // Trigger event on first ls
         if (!this.flags.first_ls) {
             this.flags.first_ls = true;
             this.triggerEvent("phase1_first_ls");
-        }
-    }
-
-    resolveDirectory(targetPath) {
-        if (typeof targetPath === 'string') {
-            const result = this.resolveRelativePath(targetPath);
-            return result && result.node && result.node.type === 'dir' ? result.node.children : null;
-        } else {
-            const node = this.resolvePath(targetPath);
-            return node && node.type === 'dir' ? node.children : null;
         }
     }
 
@@ -646,19 +745,14 @@ class GameEngine {
         const result = this.resolveRelativePath(target);
 
         if (result && result.node && result.node.type === 'dir') {
-            // Check if trying to change to a different station under /root
-            const currentStation = this.currentPath.length >= 2 ? this.currentPath[1] : null;
-            const targetStation = result.pathArray.length >= 2 ? result.pathArray[1] : null;
-
-            // List of station directories
-            const stations = ['McMurdo_Station_US', 'Vostok_Station_RU', 'Amundsen_Scott_US', 'Concordia_FR_IT'];
-
-            // If trying to change to a different station, deny
-            if (currentStation && targetStation &&
-                stations.includes(targetStation) &&
-                currentStation !== targetStation) {
-                this.terminal.print(`Error: Cannot access other stations via cd command.`, "error");
-                this.terminal.print(`Use 'connect [STATION_NAME]' or 'connect [IP_ADDRESS]' to switch stations.`, "error");
+            // Check access permissions using StationAccessControl
+            if (!StationAccessControl.canNavigateTo(this.currentPath, result.pathArray)) {
+                if (StationAccessControl.isRootLevel(result.pathArray)) {
+                    this.terminal.print(`Error: Cannot navigate to /root directly.`, "error");
+                } else {
+                    this.terminal.print(`Error: Cannot access other stations via cd command.`, "error");
+                    this.terminal.print(`Use 'connect [STATION_NAME]' or 'connect [IP_ADDRESS]' to switch stations.`, "error");
+                }
                 return;
             }
 
@@ -667,6 +761,7 @@ class GameEngine {
         } else {
             this.terminal.print(`Error: Directory '${target}' not found.`, "error");
         }
+
     }
 
     handleCat(args) {

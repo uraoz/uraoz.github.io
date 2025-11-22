@@ -159,9 +159,9 @@ const STORY_DATA = {
                                     "coffee_maker.log": {
                                         "type": "file",
                                         "contentPath": "content/mcmurdo/coffee_maker.log"
-                                        }
                                     }
-                                },
+                                }
+                            },
                             "time_capsule.txt": {
                                 "type": "file",
                                 "contentPath": "content/mcmurdo/time_capsule.txt"
@@ -336,7 +336,7 @@ const STORY_DATA = {
                         }
                     },
                     "system": {
-                       "type": "dir",
+                        "type": "dir",
                         "children": {
                             "time_capsule.txt": {
                                 "type": "file",
