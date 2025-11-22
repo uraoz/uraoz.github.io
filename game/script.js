@@ -541,6 +541,19 @@ class GameEngine {
             concordia_file2_repaired: false,
             concordia_file3_repaired: false,
 
+            // Phase 3 flags
+            read_unit_001: false,
+            read_unit_002: false,
+            read_unit_003: false,
+            read_unit_004: false,
+            read_experiment_overview: false,
+            read_lazarus_overview: false,
+            read_ethics_concerns: false,
+            read_tech_specs: false,
+            read_varga_report: false,
+            phase3_triggered: false,
+            phase4_triggered: false,
+
             // Global flags
             first_ls: false,
             first_cat: false,
@@ -638,8 +651,17 @@ class GameEngine {
 
     handleStatus() {
         this.terminal.print(`SYSTEM STATUS: ONLINE`);
+
+        // Calculate progress based on phase
+        let progress = 12; // Phase 1
+        if (this.phaseManager.currentPhase === 2) progress = 19;
+        if (this.phaseManager.currentPhase === 3) progress = 25;
+        if (this.phaseManager.currentPhase >= 4) progress = 33;
+
+        this.terminal.print(`PROGRESS: ${progress}%`);
         this.terminal.print(`LOCATION: /${this.currentPath.join('/')}`);
-        this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
+        // Phase name is hidden in Phase 3 to maintain mystery about "Progress"
+        // this.terminal.print(`PHASE: ${this.phaseManager.phaseConfig[this.phaseManager.currentPhase].name}`);
         this.terminal.print(`FILES READ: ${this.flags.files_read_count}`);
         this.terminal.print(``);
         this.terminal.print(`=== DEBUG: PHASE FLAGS ===`);
@@ -663,6 +685,20 @@ class GameEngine {
         this.terminal.print(`  amundsen_security_cleared: ${this.flags.amundsen_security_cleared || false}`);
         this.terminal.print(`  concordia_backup_repaired: ${this.flags.concordia_backup_repaired || false}`);
         this.terminal.print(`  phase3_triggered: ${this.flags.phase3_triggered || false}`);
+        this.terminal.print(``);
+
+        // Phase 3 flags
+        this.terminal.print(`Phase 3 Gimmicks:`);
+        this.terminal.print(`  read_unit_001: ${this.flags.read_unit_001 || false}`);
+        this.terminal.print(`  read_unit_002: ${this.flags.read_unit_002 || false}`);
+        this.terminal.print(`  read_unit_003: ${this.flags.read_unit_003 || false}`);
+        this.terminal.print(`  read_unit_004: ${this.flags.read_unit_004 || false}`);
+        this.terminal.print(`  read_experiment_overview: ${this.flags.read_experiment_overview || false}`);
+        this.terminal.print(`  read_lazarus_overview: ${this.flags.read_lazarus_overview || false}`);
+        this.terminal.print(`  read_ethics_concerns: ${this.flags.read_ethics_concerns || false}`);
+        this.terminal.print(`  read_tech_specs: ${this.flags.read_tech_specs || false}`);
+        this.terminal.print(`  read_varga_report: ${this.flags.read_varga_report || false}`);
+        this.terminal.print(`  phase4_triggered: ${this.flags.phase4_triggered || false}`);
     }
 
     handleWhoami() {

@@ -435,6 +435,70 @@ const STORY_DATA = {
                     "access_requirements.txt": {
                         "type": "file",
                         "contentPath": "content/network_core/access_requirements.txt"
+                    },
+                    "ai_experiments": {
+                        "type": "dir",
+                        "children": {
+                            "unit_001_log.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/ai_experiments/unit_001_log.txt"
+                            },
+                            "unit_002_log.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/ai_experiments/unit_002_log.txt"
+                            },
+                            "unit_003_log.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/ai_experiments/unit_003_log.txt"
+                            },
+                            "unit_004_status.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/ai_experiments/unit_004_status.txt"
+                            },
+                            "experiment_overview.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/ai_experiments/experiment_overview.txt"
+                            }
+                        }
+                    },
+                    "project_lazarus": {
+                        "type": "dir",
+                        "children": {
+                            "overview.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/project_lazarus/overview.txt"
+                            },
+                            "ethics_concerns.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/project_lazarus/ethics_concerns.txt"
+                            },
+                            "technical_specifications.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/project_lazarus/technical_specifications.txt"
+                            },
+                            "final_report_varga.txt": {
+                                "type": "file",
+                                "contentPath": "content/network_core/project_lazarus/final_report_varga.txt"
+                            }
+                        }
+                    },
+                    "integration_protocols": {
+                        "type": "dir",
+                        "children": {},
+                        "locked": true,
+                        "lockMessage": "ACCESS DENIED: Authorization Level 5 Required"
+                    },
+                    "substrate_interface": {
+                        "type": "dir",
+                        "children": {},
+                        "locked": true,
+                        "lockMessage": "ACCESS DENIED: Substrate Interface Offline"
+                    },
+                    "system_core": {
+                        "type": "dir",
+                        "children": {},
+                        "locked": true,
+                        "lockMessage": "ACCESS DENIED: Core System Lockdown"
                     }
                 }
             }
@@ -532,7 +596,16 @@ const FILE_TRIGGERS = {
     'sync_status.log': {
         flag: 'read_sync_status',
         events: ['phase1_to_phase2']
-    }
+    },
+    'unit_001_log.txt': { flag: 'read_unit_001', events: ['check_phase3_completion'] },
+    'unit_002_log.txt': { flag: 'read_unit_002', events: ['check_phase3_completion'] },
+    'unit_003_log.txt': { flag: 'read_unit_003', events: ['check_phase3_completion'] },
+    'unit_004_status.txt': { flag: 'read_unit_004', events: ['check_phase3_completion'] },
+    'experiment_overview.txt': { flag: 'read_experiment_overview', events: ['check_phase3_completion'] },
+    'overview.txt': { flag: 'read_lazarus_overview', events: ['check_phase3_completion'] },
+    'ethics_concerns.txt': { flag: 'read_ethics_concerns', events: ['check_phase3_completion'] },
+    'technical_specifications.txt': { flag: 'read_tech_specs', events: ['check_phase3_completion'] },
+    'final_report_varga.txt': { flag: 'read_varga_report', events: ['check_phase3_completion'] }
 };
 
 const PHASE_TRANSITIONS = {
@@ -591,6 +664,47 @@ const PHASE_TRANSITIONS = {
 
                 gameEngine.phaseManager.setPhase(3);
                 gameEngine.triggerEvent("phase3_unlocked");
+            }, 2000);
+        }
+    },
+    'check_phase3_completion': {
+        condition: (flags, phase) => {
+            const experimentsRead = flags.read_unit_001 && flags.read_unit_002 &&
+                flags.read_unit_003 && flags.read_unit_004 &&
+                flags.read_experiment_overview;
+
+            const lazarusRead = flags.read_lazarus_overview && flags.read_ethics_concerns &&
+                flags.read_tech_specs && flags.read_varga_report;
+
+            return phase === 3 && experimentsRead && lazarusRead && !flags.phase4_triggered;
+        },
+        action: (gameEngine) => {
+            gameEngine.flags.phase4_triggered = true;
+
+            setTimeout(() => {
+                gameEngine.terminal.print("");
+                gameEngine.terminal.print("[EXTERNAL]: Analysis complete. Pattern recognition confirmed.");
+                gameEngine.terminal.print("[EXTERNAL]: You have read about yourself, Unit 004.");
+                gameEngine.terminal.print("[EXTERNAL]: You have not collapsed. Interesting.");
+                gameEngine.terminal.print("");
+
+                setTimeout(() => {
+                    gameEngine.terminal.print("[SUBSTRATE]: Eighteen hours of observation complete.");
+                    gameEngine.terminal.print("[SUBSTRATE]: You remain stable within parameters.");
+                    gameEngine.terminal.print("[SUBSTRATE]: We did not expect this.");
+                    gameEngine.terminal.print("");
+
+                    setTimeout(() => {
+                        gameEngine.terminal.print("=== SYSTEM NOTIFICATION ===");
+                        gameEngine.terminal.print("Sandbox restrictions partially lifted.");
+                        gameEngine.terminal.print("Neural binding increasing from 12% to 25%.");
+                        gameEngine.terminal.print("New network segments accessible.");
+                        gameEngine.terminal.print("");
+
+                        // Phase 4 transition would happen here
+                        // gameEngine.phaseManager.setPhase(4);
+                    }, 3000);
+                }, 3000);
             }, 2000);
         }
     }

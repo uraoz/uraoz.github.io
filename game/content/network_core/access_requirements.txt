@@ -28,6 +28,3 @@ CONTENTS:
 - /system_core/ - [LOCKED - Phase 5]
 
 You may now access Phase 3 content.
-
-[Note: This security system was designed by Dr. Helena Varga]
-[Note: "No single station should hold the keys to digital immortality"]
